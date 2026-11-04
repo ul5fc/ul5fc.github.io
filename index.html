@@ -2042,7 +2042,7 @@ function renderPlay(){
   +'<div class="card"><h3 class="mincho" style="margin-bottom:6px;font-size:.95rem">今年の重点（6歳から）</h3><div class="focus-sel" id="focusSel"></div>'
   +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生地図（1マス＝1年）</h3><div class="mapgrid" id="mapGrid"></div>'
   +'<p class="small" style="margin-top:8px">この時代の平均寿命の目安：約'+s.le+'歳</p>'
-  +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生の図鑑</h3><div class="kv"><span>集めたしるし</span><b>'+Object.keys(META.badges).length+' / 60</b></div><div class="badge-progress" style="margin:4px 0 2px"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small">しるしは人生を終えると増えます。図鑑は最初の画面で見られます。</p></div></div>'
+  +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生の図鑑</h3><div class="kv"><span>集めたしるし</span><b>'+Object.keys(META.badges).length+' / 60</b></div><div class="badge-progress" style="margin:4px 0 2px"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small">しるしは人生を終えると増えます。図鑑は最初の画面で見られます。</p></div>\' + \'<div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">生存曲線（同じ時代に生まれた人）</h3><canvas id="curveCv" width="660" height="250" style="width:100%;height:auto;display:block"></canvas><p class="small" id="curveNote" style="margin-top:6px"></p></div>\' + \'</div>'
   +'<div class="col active" data-col="log">'
   +'<div class="scene-wrap" id="sceneWrap"><canvas class="scene" id="sceneCv" width="480" height="300" role="img" aria-label="いまの場面"></canvas>'
   +'<div class="scene-cap" id="sceneCap"></div><div class="scene-tap">タップで次の年へ</div></div>'
@@ -2108,9 +2108,15 @@ function renderSide(){
   const ie=$("#idEdu");if(ie)ie.textContent=eduFloor(s);
   const ij=$("#idJob");if(ij)ij.textContent=s.job||"―";
   const mg=$("#mapGrid");if(mg){let html="";for(let a=0;a<115;a++)html+='<i class="'+(a<s.age?"lived":a===s.age?"now":"")+'"></i>';mg.innerHTML=html}
+  drawCurve(s);
   const ap=$("#ageProg");if(ap)ap.style.width=(s.age/110*100)+"%";
   drawFace($("#faceCv"),s);updateSceneHud(s);
 }
+function survivalPts(era){const M=ERA_MORT[era]||ERA_MORT[2026];const pts=[1];let l=1;for(let a=0;a<110;a++){const h=a===0?M.inf:a<5?M.child:a<40?M.young:M.A*Math.exp((a-40)/M.g);l*=1-Math.min(0.98,h);pts.push(l)}return pts}
+function drawCurve(s){const cv=document.querySelector("#curveCv");if(!cv)return;const ctx=cv.getContext("2d");const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);const cs=getComputedStyle(document.documentElement);const ink=(cs.getPropertyValue("--ink")||"").trim()||"#33302A";const accent=(cs.getPropertyValue("--accent")||"").trim()||"#8E1F3F";const line=(cs.getPropertyValue("--line")||"").trim()||"#DDD5C2";const pts=survivalPts(s.era);const L=46,R=14,T=14,B=32,pw=W-L-R,ph=H-T-B;ctx.font="20px sans-serif";for(let g=0;g<=4;g++){const y=T+ph*g/4;ctx.strokeStyle=line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+pw,y);ctx.stroke();ctx.fillStyle=ink;ctx.globalAlpha=.65;ctx.fillText((100-g*25)+"%",2,y+7);ctx.globalAlpha=1}for(const ax of[0,25,50,75,100]){const x=L+pw*ax/110;ctx.fillStyle=ink;ctx.globalAlpha=.65;ctx.fillText(ax+"歳",x-14,H-8);ctx.globalAlpha=1}
+ctx.beginPath();pts.forEach((p,a)=>{const x=L+pw*a/110,y=T+ph*(1-p);if(a)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.strokeStyle=accent;ctx.lineWidth=3;ctx.stroke();ctx.lineTo(L+pw,T+ph);ctx.lineTo(L,T+ph);ctx.closePath();ctx.globalAlpha=.12;ctx.fillStyle=accent;ctx.fill();ctx.globalAlpha=1;
+const ca=Math.max(0,Math.min(110,s.age)),cp=pts[ca],cx=L+pw*ca/110,cy=T+ph*(1-cp);ctx.setLineDash([5,5]);ctx.strokeStyle=ink;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,T);ctx.lineTo(cx,T+ph);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(cx,cy,7,0,7);ctx.fillStyle=accent;ctx.fill();ctx.lineWidth=3;ctx.strokeStyle="#FFFFFF";ctx.stroke();
+const nt=document.querySelector("#curveNote");if(nt)nt.textContent=s.age+"歳のいま、同じ時代に生まれた人の約"+Math.round(cp*100)+"%が生きている計算です（このゲームの統計モデルによる目安）。";}
 function doMoneyAction(id){
   const s=sim.s;const a=MONEY_ACTIONS.find(x=>x.id===id);if(!a)return;
   const sav=savingsOf(s);
@@ -2231,7 +2237,7 @@ function showDeltas(deltas){
   }
   if(sim&&sim.s)ui.prevStats=Object.assign({},sim.s.stats);
   if(REDUCED)return;
-  for(const k in deltas){if(!deltas[k])continue;const hostEl=$("#statVal-"+k);if(!hostEl)continue;const r=hostEl.getBoundingClientRect();const el=document.createElement("div");el.className="delta-float";el.style.left=(r.right+8)+"px";el.style.top=(r.top-4)+"px";el.style.color=deltas[k]>0?"#3F7D2C":"#C0392B";el.textContent=statName(k)+" "+(deltas[k]>0?"+":"−")+Math.abs(deltas[k]);document.body.appendChild(el);setTimeout(()=>el.remove(),1200)}
+  for(const k in deltas){if(!deltas[k])continue;const hostEl=$("#statVal-"+k);if(!hostEl)continue;const r=hostEl.getBoundingClientRect();if(!r.width)continue;const el=document.createElement("div");el.className="delta-float";el.style.left=(r.right+8)+"px";el.style.top=(r.top-4)+"px";el.style.color=deltas[k]>0?"#3F7D2C":"#C0392B";el.textContent=statName(k)+" "+(deltas[k]>0?"+":"−")+Math.abs(deltas[k]);document.body.appendChild(el);setTimeout(()=>el.remove(),1200)}
 }
 /* ---------- game loop v3: dwell by year TYPE, matching the original's measured model ----------
    Original (measured over 3 lives at 1x): quiet year ≈11.8s, milestone year ≈21.4s,
@@ -2462,6 +2468,7 @@ return earned;
 }
 function endingSceneText(){
 const s=sim.s;const parts=[];
+if(s.deathAge<=2)return "生まれて間もない最期だった。名前を呼ばれ、抱かれて、短い時間を生きた。";
 if(s.spouse&&s.spouse.alive)parts.push("最期のとき、そばには伴侶の"+esc(s.spouse.name)+"がいた。");
 else if(s.children.length)parts.push("最期のとき、子どもたちが見守ってくれた。");
 else if(s.stats.re>=60)parts.push("最期のとき、友人や近所の人が集まってくれた。");
