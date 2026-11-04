@@ -1536,10 +1536,10 @@ function renderLanding(){
   app.innerHTML='<div class="wrap">'
   +'<header class="hero"><div class="kicker">47都道府県の統計にもとづく人生シミュレーション</div><h1>1.2億分の1</h1>'
   +'<p class="sub">いま日本では、約46秒にひとりの赤ちゃんが生まれています。その「ひとり」になって、生まれてから最期までを生きる体験です。どこに・誰の子として生まれるかは、選べません。</p>'
-  +'<div class="counter"><div class="box"><div class="num" id="cntBirth">0</div><div class="lbl"><span class="cycledot"></span>このページを開いてから生まれた赤ちゃん（約46秒に1人）</div><div class="cyclebar"><i style="animation-duration:46s"></i></div></div>'
-  +'<div class="box"><div class="num" id="cntDeath">0</div><div class="lbl"><span class="cycledot"></span>同じ時間に世を去った人（約20秒に1人）</div><div class="cyclebar"><i style="animation-duration:20s"></i></div></div>'
+  +'<div class="counter"><div class="box"><div class="num" id="cntBirth">0</div><div class="lbl"><span class="cycledot"></span>このサイトが公開されてから生まれた赤ちゃん（約46秒に1人）</div><div class="cyclebar"><i style="animation-duration:46s"></i></div></div>'
+  +'<div class="box"><div class="num" id="cntDeath">0</div><div class="lbl"><span class="cycledot"></span>このサイトが公開されてから亡くなった人（約20秒に1人）</div><div class="cyclebar"><i style="animation-duration:20s"></i></div></div>'
   +(COUNTER_API?'<div class="box"><div class="num" id="cntPlays">―</div><div class="lbl">のべプレイ回数（実測）</div></div>':"")+'</div>'
-  +'<div class="count-note">※バーの1周が、それぞれの間隔です。間隔は厚生労働省「人口動態統計」2024年確定数から計算（出生686,173人→約46秒に1人、死亡1,605,378人→約20秒に1人）。'+(COUNTER_API?'プレイ回数は実際の集計値です。':"")+'</div>'
+  +'<div class="count-note">※上の2つの数字は、このサイトが公開された2026年11月4日 22:34（日本時間）からの経過時間に、年間の出生数・死亡数から換算した割合を掛けた推計値です。実際の人数を数えたものではありません。バーの1周が、それぞれの間隔です。間隔は厚生労働省「人口動態統計」2024年確定数から計算（出生686,173人→約46秒に1人、死亡1,605,378人→約20秒に1人）。'+(COUNTER_API?'プレイ回数は実際の集計値です。':"")+'</div>'
   +'<div class="nowbaby"><div class="nb-title">いま生まれる赤ちゃんだったら（行き先の割合・2024年出生分布）</div>'+(()=>{const sorted=PREFS.slice().sort((a,b)=>b[1]-a[1]);const mx=sorted[0][1];const mn=sorted[sorted.length-1];return sorted.slice(0,5).map(p=>'<div class="nb-row"><span class="nb-name">'+esc(p[0])+'</span><span class="nb-bar"><i style="width:'+Math.round(p[1]/mx*100)+'%"></i></span><span class="nb-pct">'+p[1]+'%</span></div>').join("")+'<div class="nb-row"><span class="nb-name">'+esc(mn[0])+'</span><span class="nb-bar"><i style="width:'+Math.max(2,Math.round(mn[1]/mx*100))+'%"></i></span><span class="nb-pct">'+mn[1]+'%</span></div><p class="small" style="margin-top:6px">いちばん少ない県でも、約'+Math.round(100/mn[1])+'回に1回は生まれる計算です。</p>'})()+'</div></header>'
   +(saved&&saved.sim?'<div class="panel card"><h3 class="mincho">続きから</h3><p>'+esc(saved.sim.surname)+' '+esc(saved.sim.given)+'（'+esc(saved.sim.birthPref)+'生まれ）・いま'+saved.sim.age+'歳の人生が保存されています。</p><div class="row" style="margin-top:10px"><button class="btn primary" id="btnResume">続きから生きる</button><button class="btn" id="btnDiscard">この人生を破棄</button></div></div>':"")
   +'<div class="panel card"><h3 class="mincho">生まれる時代</h3><div class="era-list" id="eraPills">'+eraCards+'</div>'
@@ -1562,10 +1562,13 @@ function renderLanding(){
   +'<details class="src"><summary>何が実際のデータなのか</summary><p class="small">出生の抽選ウェイトは、厚生労働省「人口動態統計」（2024年確定数）の都道府県別出生数そのものの割合です（東京都12.27%・神奈川県7.49%・大阪府7.78%・愛知県6.63%・埼玉県5.82%・千葉県4.92%・福岡県4.70%・最少は鳥取県と高知県の0.45%）。平均寿命の目安は厚生労働省「生命表」（完全生命表）の男女平均の値で、2050年の平均寿命・出生数・人口見通しは国立社会保障・人口問題研究所「日本の将来推計人口（令和5年推計）」にもとづきます。出生性比は男：女＝105：100として計算しています。死因の構成や時代ごとの死亡率は公的統計の傾向に合わせて調整したモデル値です。作中の人物・出来事は統計をもとにした創作です。</p></details>'
   +'<details class="src" open><summary>つらいときの相談先</summary><p class="small">シミュレーションの中のできごとで気持ちが重くなったときは、ひとりで抱えずに話してみてください。</p><ul class="small tel-list" style="margin-left:18px;margin-top:6px"><li>よりそいホットライン <a href="tel:0120279338">0120-279-338</a>（無料・24時間）</li><li>いのちの電話 <a href="tel:0120783556">0120-783-556</a>（無料・毎日16時〜21時）</li><li>こころの健康相談統一ダイヤル <a href="tel:0570064556">0570-064-556</a>（通話料がかかります）</li><li>24時間子供SOSダイヤル <a href="tel:0120078310">0120-0-78310</a>（無料・24時間・おもに18歳まで）</li></ul><p class="small" style="margin-top:6px">番号をタップすると、そのまま電話をかけられます。ほかの窓口は厚生労働省「<a href="https://www.mhlw.go.jp/mamorouyokokoro/" target="_blank" rel="noopener">まもろうよ こころ</a>」にまとまっています。</p></details>'
   +'<p class="small" style="text-align:center;margin-top:20px">このサイトは世界版の人生シミュレーションに着想を得て、日本の統計で独自に作った個人制作です。</p></div></div>';
-  /* counter animation (births/deaths tick at the sourced real-world intervals) */
-  let cb=0,cd=0;const tBirth=setInterval(()=>{cb++;const e=$("#cntBirth");if(e)e.textContent=cb;else clearInterval(tBirth)},46000);
-  const tDeath=setInterval(()=>{cd++;const e=$("#cntDeath");if(e)e.textContent=cd;else clearInterval(tDeath)},20000);
-  ui.counterTimers=[tBirth,tDeath];
+  /* counter: births/deaths since this site launched (2026-11-04 22:34 JST).
+     Estimates from MHLW 2024 final totals over a 31,536,000-second year:
+     686,173 births -> one every 45.96s; 1,605,378 deaths -> one every 19.64s. */
+  const SITE_LAUNCH_MS=1793799240000;
+  const updSince=()=>{const el=Math.max(0,(Date.now()-SITE_LAUNCH_MS)/1000);const b=$("#cntBirth"),d=$("#cntDeath");if(b)b.textContent=Math.floor(el/45.96).toLocaleString();if(d)d.textContent=Math.floor(el/19.64).toLocaleString();return !!(b&&d)};
+  updSince();const tSince=setInterval(()=>{if(!updSince())clearInterval(tSince)},1000);
+  ui.counterTimers=[tSince];
   loadPlayCount();
   /* bindings */
   $("#eraPills").addEventListener("click",e=>{const b=e.target.closest("[data-era]");if(!b)return;META.settings.era=parseInt(b.dataset.era,10);saveMeta();renderLanding()});
