@@ -364,14 +364,16 @@ const $=(s,r)=>(r||document).querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 function toast(msg){const t=$("#toast");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400)}
-/* ---------- real play counter (Cloudflare Worker + D1) ----------
-   Deploy publish/counter-worker.js (see publish/SETUP.md) and put its URL here.
+/* ---------- real play counter (Upstash Redis REST) ----------
+   Hits call /incr/<key>; the landing reads /get/lives. The token below is a
+   public client credential for this counter only (it ships in the page).
    Empty = disabled: the plays box is not shown and nothing is sent anywhere.
    Only event names are ever sent (lives / finished / era-YYYY / lineage) —
    no personal data, no identifiers. */
-const COUNTER_API="";
-function countHit(key){if(!COUNTER_API)return;try{fetch(COUNTER_API+"/hit/"+key,{method:"POST",mode:"cors",keepalive:true}).catch(()=>{})}catch(e){}}
-function loadPlayCount(){if(!COUNTER_API)return;try{fetch(COUNTER_API+"/count",{mode:"cors"}).then(r=>r.json()).then(j=>{const el=$("#cntPlays");if(el&&typeof j.lives==="number")el.textContent=j.lives.toLocaleString()}).catch(()=>{})}catch(e){}}
+const COUNTER_API="https://eminent-stingray-158680.upstash.io";
+const COUNTER_TOKEN="";
+function countHit(key){if(!COUNTER_TOKEN)return;try{fetch(COUNTER_API+"/incr/"+encodeURIComponent(key),{headers:{Authorization:"Bearer "+COUNTER_TOKEN},mode:"cors",keepalive:true}).catch(()=>{})}catch(e){}}
+function loadPlayCount(){if(!COUNTER_TOKEN)return;try{fetch(COUNTER_API+"/get/lives",{headers:{Authorization:"Bearer "+COUNTER_TOKEN},mode:"cors"}).then(r=>r.json()).then(j=>{const el=$("#cntPlays");if(el)el.textContent=(parseInt(j.result,10)||0).toLocaleString()}).catch(()=>{})}catch(e){}}
 
 /* ---------- data: prefectures ---------- */
 /* 出生ウェイト: 厚生労働省「人口動態統計」2024年確定数の都道府県別出生数（全国計は確定数で686,173人、
@@ -1538,8 +1540,8 @@ function renderLanding(){
   +'<p class="sub">いま日本では、約46秒にひとりの赤ちゃんが生まれています。その「ひとり」になって、生まれてから最期までを生きる体験です。どこに・誰の子として生まれるかは、選べません。</p>'
   +'<div class="counter"><div class="box"><div class="num" id="cntBirth">0</div><div class="lbl"><span class="cycledot"></span>このサイトが公開されてから生まれた赤ちゃん（約46秒に1人）</div><div class="cyclebar"><i style="animation-duration:46s"></i></div></div>'
   +'<div class="box"><div class="num" id="cntDeath">0</div><div class="lbl"><span class="cycledot"></span>このサイトが公開されてから亡くなった人（約20秒に1人）</div><div class="cyclebar"><i style="animation-duration:20s"></i></div></div>'
-  +(COUNTER_API?'<div class="box"><div class="num" id="cntPlays">―</div><div class="lbl">のべプレイ回数（実測）</div></div>':"")+'</div>'
-  +'<div class="count-note">※上の2つの数字は、このサイトが公開された2026年11月4日 22:34（日本時間）からの経過時間に、年間の出生数・死亡数から換算した割合を掛けた推計値です。実際の人数を数えたものではありません。バーの1周が、それぞれの間隔です。間隔は厚生労働省「人口動態統計」2024年確定数から計算（出生686,173人→約46秒に1人、死亡1,605,378人→約20秒に1人）。'+(COUNTER_API?'プレイ回数は実際の集計値です。':"")+'</div>'
+  +(COUNTER_TOKEN?'<div class="box"><div class="num" id="cntPlays">―</div><div class="lbl">のべプレイ回数（実測）</div></div>':"")+'</div>'
+  +'<div class="count-note">※上の2つの数字は、このサイトが公開された2026年11月4日 22:34（日本時間）からの経過時間に、年間の出生数・死亡数から換算した割合を掛けた推計値です。実際の人数を数えたものではありません。バーの1周が、それぞれの間隔です。間隔は厚生労働省「人口動態統計」2024年確定数から計算（出生686,173人→約46秒に1人、死亡1,605,378人→約20秒に1人）。'+(COUNTER_TOKEN?'プレイ回数は実際の集計値です。':"")+'</div>'
   +'<div class="nowbaby"><div class="nb-title">いま生まれる赤ちゃんだったら（行き先の割合・2024年出生分布）</div>'+(()=>{const sorted=PREFS.slice().sort((a,b)=>b[1]-a[1]);const mx=sorted[0][1];const mn=sorted[sorted.length-1];return sorted.slice(0,5).map(p=>'<div class="nb-row"><span class="nb-name">'+esc(p[0])+'</span><span class="nb-bar"><i style="width:'+Math.round(p[1]/mx*100)+'%"></i></span><span class="nb-pct">'+p[1]+'%</span></div>').join("")+'<div class="nb-row"><span class="nb-name">'+esc(mn[0])+'</span><span class="nb-bar"><i style="width:'+Math.max(2,Math.round(mn[1]/mx*100))+'%"></i></span><span class="nb-pct">'+mn[1]+'%</span></div><p class="small" style="margin-top:6px">いちばん少ない県でも、約'+Math.round(100/mn[1])+'回に1回は生まれる計算です。</p>'})()+'</div></header>'
   +(saved&&saved.sim?'<div class="panel card"><h3 class="mincho">続きから</h3><p>'+esc(saved.sim.surname)+' '+esc(saved.sim.given)+'（'+esc(saved.sim.birthPref)+'生まれ）・いま'+saved.sim.age+'歳の人生が保存されています。</p><div class="row" style="margin-top:10px"><button class="btn primary" id="btnResume">続きから生きる</button><button class="btn" id="btnDiscard">この人生を破棄</button></div></div>':"")
   +'<div class="panel card"><h3 class="mincho">生まれる時代</h3><div class="era-list" id="eraPills">'+eraCards+'</div>'
