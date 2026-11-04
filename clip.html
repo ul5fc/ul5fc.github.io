@@ -1,0 +1,1 @@
+<button id=b>Read</button><textarea id=t rows=10 cols=80></textarea><script>document.getElementById('b').onclick=async()=>{try{document.getElementById('t').value=await navigator.clipboard.readText()}catch(e){document.getElementById('t').value='ERR:'+e}}</script>
