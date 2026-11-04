@@ -1952,7 +1952,7 @@ function drawSceneFrame(cv,t){
     ctx.fillStyle="#E8E0CC";ctx.fillRect(356,GY-34,76,34);ctx.fillStyle=glow?"#FFD98A":"#A9C8DC";ctx.fillRect(364,GY-28,26,16);ctx.fillRect(400,GY-28,24,16);
     drawTree(ctx,300,GY+10,0.75,season,tE,7);
   }else if(stage==="family"){
-    drawHouse(ctx,92,GY,172,118,{glow:glow,chimney:true,roof:"#7C4A3A",windows:[[0.12,0.14],[0.58,0.14],[0.12,0.58],[0.62,0.58]],doorAt:0.4});
+    drawHouse(ctx,92,GY,172,118,{glow:glow,chimney:true,roof:"#7C4A3A",windows:[[0.12,0.14],[0.62,0.14],[0.12,0.58],[0.62,0.58]],doorAt:0.4});
     /* laundry */
     ctx.fillStyle="#8A8F96";ctx.fillRect(300,GY-52,3,52);ctx.fillRect(352,GY-52,3,52);ctx.strokeStyle="rgba(90,83,68,.8)";ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(300,GY-50);ctx.lineTo(352,GY-50);ctx.stroke();
     const sw=REDUCED?0:Math.sin(tE*0.0022)*2.4;
