@@ -933,7 +933,10 @@ Sim.prototype._birth=function(){
     residence:"",birthPref:"",reloc:{},focusSel:null,focusLog:{},lastDeltas:{},companions:[],rarityText:"",temperament:"",talent:"",wealthTier:2,
     father:{present:true,alive:true,age:30,job:""},mother:{present:true,alive:true,age:29,job:""},siblings:0,surname:"",given:"",sex:""};
   s.surname=lin?lin.surname:rng.pick(SURNAMES);
-  const prefEntry=lin?PREFS.find(p=>p[0]===lin.pref):rng.weighted(PREFS,p=>p[1]);
+  const popMode=!lin&&META.settings.birthMode==="pop";
+   const prefEntry=lin?PREFS.find(p=>p[0]===lin.pref):(popMode?rng.weighted(Object.entries(PREF_POP),p=>p[1]):rng.weighted(PREFS,p=>p[1]));
+   const birthShare=popMode?(prefEntry[1]/POP_TOTAL):(prefEntry[1]/PREF_TOTAL);
+   s.birthBasis=popMode?"2025年国勢調査の人口分布":"2024年人口動態統計の出生分布";
   s.birthPref=prefEntry[0];s.residence=s.birthPref;
   s.sex=rng.chance(0.512)?"男性":"女性";
   s.given=rng.pick(s.sex==="男性"?GIVEN_M:GIVEN_F);
@@ -948,7 +951,7 @@ Sim.prototype._birth=function(){
   s.temperament=rng.pick(TEMPERAMENTS);s.talent=rng.pick(TALENTS);
   s.stats.he=rng.int(46,60);s.stats.ha=rng.int(48,60);s.stats.re=rng.int(52,64);
   /* レア度は実統計の周辺分布のみ: 出生県の割合（2024年人口動態統計）× 性別（出生性比105:100） */
-  const pPref=prefEntry[1]/PREF_TOTAL,pSex=s.sex==="男性"?0.512:0.488;
+  const pPref=birthShare,pSex=s.sex==="男性"?0.512:0.488;
   const N=1/(pPref*pSex);
   s.rarityN=Math.round(N);
   s.rarityText=N>=10000?"約"+(Math.round(N/1000)/10).toLocaleString()+"万人に1人":"約"+Math.round(N).toLocaleString()+"人に1人";
@@ -1611,7 +1614,7 @@ function renderLanding(){
   +'<div class="row" style="margin-top:12px"><button class="toggle" id="tglOmakase" aria-pressed="'+st.omakase+'"><span class="dot"></span>おまかせ観察<span class="st">'+(st.omakase?"ON":"OFF")+'</span></button><span class="small">ONにすると決断・ひと息も自動で進みます（記録には「なりゆき」「自動回答」と残ります）。配信・朗読モードとは併用できません。</span></div>'
   +'<div class="row" style="margin-top:8px"><button class="toggle" id="tglTimer" aria-pressed="'+st.timerOn+'"'+(st.mode==="haishin"?" disabled style=\"opacity:.45\"":"")+'><span class="dot"></span>なりゆきタイマー<span class="st">'+(st.timerOn?"ON":"OFF")+'</span></button><span class="small">'+(st.mode==="haishin"?"配信・朗読モードではタイマーは無効です（決断は自動で進みません）。":"ONのときだけ、決断30秒・ひと息15秒で「なりゆき」に進みます。OFFでは時間は止まります。")+'</span></div>'
   +'<div class="row" style="margin-top:8px"><button class="toggle" id="tglDark" aria-pressed="'+st.dark+'"><span class="dot"></span>ダークモード<span class="st">'+(st.dark?"ON":"OFF")+'</span></button><button class="toggle" id="tglSfx" aria-pressed="'+st.sfx+'"><span class="dot"></span>効果音<span class="st">'+(st.sfx?"ON":"OFF")+'</span></button><span class="small">設定はこの端末に保存されます。</span></div>'
-  +'<button class="btn primary big" id="btnBirth">生まれる</button>'
+  +'<div style="margin-top:12px"><div class="small" style="font-weight:700;margin-bottom:4px">生まれる場所の決まり方</div>'+'<label class="small" style="display:block;margin:3px 0"><input type="radio" name="birthMode" value="birth"'+(st.birthMode!=="pop"?" checked":"")+' style="accent-color:#8E1F3F"> いま生まれる赤ちゃん（都道府県ごとの出生数の割合）</label>'+'<label class="small" style="display:block;margin:3px 0"><input type="radio" name="birthMode" value="pop"'+(st.birthMode==="pop"?" checked":"")+' style="accent-color:#8E1F3F"> いま生きている人びと（都道府県ごとの人口の割合）</label>'+'<div class="small" style="opacity:.75">どちらでも、人生は0歳から始まります。県の出やすさが少しだけ変わります。</div></div>'+'<button class="btn primary big" id="btnBirth">生まれる</button>'
   +'<button class="btn" id="btnDaily" style="width:100%;margin-top:10px">今日の種で生まれる（その日みんな同じ始まり）</button>'
   +'<p class="small" style="margin-top:10px">設定はそのままで、すぐに生まれてもかまいません。病気や死、介護のような重いできごとも、実際の統計の傾向に沿って出てきます。</p></div>'
   +'<div class="panel card"><h3 class="mincho">人生の図鑑（集めたしるし '+Object.keys(META.badges).length+' / 60）</h3><div class="badge-progress"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small" style="margin-bottom:4px">生きた人生 '+META.lives+'回 ・ 生まれた都道府県 '+META.prefs.length+' / 47 ・ 生きた時代 '+META.eras.length+' / 6'+(META.totals&&META.totals.lives?' ・ 平均の享年 '+(Math.round(META.totals.ageSum/META.totals.lives*10)/10)+'歳 ・ 最長 '+META.totals.maxAge+'歳 / 最短 '+META.totals.minAge+'歳':"")+'</p><p class="small" style="margin-bottom:6px">記録（実績・図鑑・前世の記録）はこのブラウザに保存されます。iPhoneでは、このサイトをホーム画面に追加しておくと記録が消えにくくなります。</p>'+badgeHtml+'</div>'
@@ -1639,6 +1642,7 @@ function renderLanding(){
   bindToggle("#tglTimer","timerOn");bindToggle("#tglDark","dark",()=>document.body.classList.toggle("dark",META.settings.dark));bindToggle("#tglSfx","sfx");
   const om=$("#tglOmakase");if(om)om.addEventListener("click",()=>{if(!META.settings.omakase&&META.settings.mode==="haishin"){toast("配信・朗読モードではおまかせは使えません");return}META.settings.omakase=!META.settings.omakase;saveMeta();renderLanding()});
   $("#btnBirth").addEventListener("click",()=>startLife(null,null));
+  document.querySelectorAll('input[name="birthMode"]').forEach(r=>r.addEventListener("change",()=>{META.settings.birthMode=r.value;saveMeta()}));
   $("#btnDaily").addEventListener("click",()=>{const d=new Date();const seed="daily-"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();startLife(seed,null)});
   const rb=$("#btnResume");if(rb)rb.addEventListener("click",resumeLife);
   const db=$("#btnDiscard");if(db)db.addEventListener("click",()=>{store.del(SAVE_KEY);renderLanding()});
@@ -1724,7 +1728,7 @@ function showBirthCard(ov,done){
   +'<h2 class="mincho" style="font-size:1.9rem">'+esc(s.surname)+' '+esc(s.given)+'</h2>'
   +'<p>'+esc(s.birthPref)+' ・ '+s.birthYear+'年生まれ ・ '+s.sex+'</p>'
   +'<p style="margin:8px 0"><span class="rarity">この組み合わせは '+esc(s.rarityText)+'</span></p>'
-  +'<p class="small">組み合わせ（出生県×性別）から計算。出生県の割合は2024年人口動態統計の出生分布、性別は出生性比（男：女＝105：100）にもとづきます。</p>'
+  +'<p class="small">組み合わせ（出生県×性別）から計算。出生県の割合は'+(s.birthBasis||"2024年人口動態統計の出生分布")+'、性別は出生性比（男：女＝105：100）にもとづきます。</p>'
   +'<div style="margin-top:10px"><div class="kv"><span>父</span><b>'+s.father.age+'歳・'+esc(s.father.job)+(s.father.present?"":"（不在）")+'</b></div>'
   +'<div class="kv"><span>母</span><b>'+s.mother.age+'歳・'+esc(s.mother.job)+(s.mother.present?"":"（不在）")+'</b></div>'
   +'<div class="kv"><span>きょうだい</span><b>'+s.siblings+'人</b></div>'
