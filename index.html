@@ -1085,6 +1085,12 @@ Sim.prototype._promote=function(){
   }
   return null;
 };
+Sim.prototype._ambientFill=function(){
+  const s=this.s;if(s.log.length&&s.log[s.log.length-1].age===s.age)return;
+  const pool=AMBIENT[ambientStage(s.age)];
+  const fresh=pool.filter(t=>!s.log.some(e=>e.txt.includes(t)));
+  this._log(s.age,this.rng.pick(fresh.length?fresh:pool),"norm");
+};
 Sim.prototype.advance=function(){
   const s=this.s;
   if(s.dead)return"done";
@@ -1158,16 +1164,15 @@ Sim.prototype.advance=function(){
   /* Ambient flavor fills ONLY a year that produced no record of its own.
      Before this gate, a milestone year also got an ambient card, so a single
      year dumped 2-3 cards at once (user screenshot: age 1 milestone+ambient). */
-  if(!s.queue.length&&s.log.length===logBefore){
-    const pool=AMBIENT[ambientStage(s.age)];
-    /* Never repeat an ambient line while the stage pool still has unused
-       ones (pools are 16 per stage; a repeat is the last resort). The same
-       sentence at ages 2 and 4 (seen in playtest) reads as filler. */
-    const fresh=pool.filter(t=>!s.log.some(e=>e.txt.includes(t)));
-    this._log(s.age,this.rng.pick(fresh.length?fresh:pool),"norm");
-  }
+  if(!s.queue.length&&s.log.length===logBefore)this._ambientFill();
   if(this._deathCheck())return"done";
   const pk2=this._promote();if(pk2)return pk2;
+  /* Safety net: an offer queued this year blocks the ambient fill above,
+     but _promote may silently drop it (stale cond / maxUses / no visible
+     choices), leaving the year with no record at all. Audit 2026-11-04:
+     ~12% of lives had a missing year, concentrated where partnership
+     decisions are re-offered (ages 28-38). Guarantee one line per year. */
+  if(s.log.length===logBefore)this._ambientFill();
   return"year";
 };
 
@@ -1555,7 +1560,7 @@ function renderLanding(){
   +'<button class="btn primary big" id="btnBirth">生まれる</button>'
   +'<button class="btn" id="btnDaily" style="width:100%;margin-top:10px">今日の種で生まれる（その日みんな同じ始まり）</button>'
   +'<p class="small" style="margin-top:10px">設定はそのままで、すぐに生まれてもかまいません。病気や死、介護のような重いできごとも、実際の統計の傾向に沿って出てきます。</p></div>'
-  +'<div class="panel card"><h3 class="mincho">人生の図鑑（集めたしるし '+Object.keys(META.badges).length+' / 60）</h3><div class="badge-progress"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small" style="margin-bottom:4px">生きた人生 '+META.lives+'回 ・ 生まれた都道府県 '+META.prefs.length+' / 47 ・ 生きた時代 '+META.eras.length+' / 6'+(META.totals&&META.totals.lives?' ・ 平均の享年 '+(Math.round(META.totals.ageSum/META.totals.lives*10)/10)+'歳 ・ 最長 '+META.totals.maxAge+'歳 / 最短 '+META.totals.minAge+'歳':"")+'</p>'+badgeHtml+'</div>'
+  +'<div class="panel card"><h3 class="mincho">人生の図鑑（集めたしるし '+Object.keys(META.badges).length+' / 60）</h3><div class="badge-progress"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small" style="margin-bottom:4px">生きた人生 '+META.lives+'回 ・ 生まれた都道府県 '+META.prefs.length+' / 47 ・ 生きた時代 '+META.eras.length+' / 6'+(META.totals&&META.totals.lives?' ・ 平均の享年 '+(Math.round(META.totals.ageSum/META.totals.lives*10)/10)+'歳 ・ 最長 '+META.totals.maxAge+'歳 / 最短 '+META.totals.minAge+'歳':"")+'</p><p class="small" style="margin-bottom:6px">記録（実績・図鑑・前世の記録）はこのブラウザに保存されます。iPhoneでは、このサイトをホーム画面に追加しておくと記録が消えにくくなります。</p>'+badgeHtml+'</div>'
   +'<div class="panel card"><h3 class="mincho">時代の図鑑</h3><p class="small" style="margin-bottom:6px">時代ごとに10のしるしがあります。まだのしるしは伏せてあります。</p>'+eraZukanHtml+'</div>'
   +'<div class="panel card"><h3 class="mincho">図鑑をシェアする</h3><p class="small" style="margin-bottom:8px">集めたしるしと時代の進み具合を、1枚の画像にします。</p><button class="btn" id="btnZukanShare">図鑑の画像を保存</button></div>'
   +'<div class="panel card"><h3 class="mincho">生まれた都道府県（'+META.prefs.length+' / 47）</h3><div class="prefmap">'+prefMapHtml+'</div><p class="small" style="margin-top:6px">生まれた回数で色が濃くなります。</p></div>'
@@ -1680,17 +1685,43 @@ function showBirthCard(ov,done){
 /* ---------- play screen ---------- */
 function drawFace(cv,s){
   if(!cv)return;const ctx=cv.getContext("2d");const W=16;cv.width=W;cv.height=W;
+  const px=(x,y,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,1,1)};
+  const rect=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
   const h1=hashStr(s.surname+s.given+s.sex);
-  const skin=["#F2C9A0","#E8B98A","#D9A066"][(h1>>3)%3];
-  const hairAge=s.age<50?"#3A2C1E":s.age<70?"#7A6A55":"#CFC8BC";
+  /* NOTE: always use >>> (unsigned) here — a signed >> can make the index negative and the palette lookup undefined */
+  const skin=["#F6CFA3","#EDBE8F","#DFA96F"][(h1>>>3)%3];
+  const skinDark=["#DFA96F","#D29E66","#C08B4E"][(h1>>>3)%3];
+  const youngHair=["#2E2119","#3A2C1E","#463322","#553F2A"][(h1>>>5)%4];
+  const hairCol=s.age<50?youngHair:s.age<65?((h1>>>7)%2?"#6E5F4E":youngHair):s.age<80?"#A79C8B":"#CFC8BC";
   const eraSepia=(s.era===1920||s.era===1940);
-  ctx.fillStyle=eraSepia?"#D8C49A":"#BFD6E4";ctx.fillRect(0,0,16,16);
-  ctx.fillStyle=skin;ctx.fillRect(4,4,8,9);
-  ctx.fillStyle=hairAge;ctx.fillRect(4,2,8,3);ctx.fillRect(3,3,2,5);ctx.fillRect(11,3,2,5);
-  if(s.sex==="女性"){ctx.fillRect(3,3,2,9);ctx.fillRect(11,3,2,9)}
-  ctx.fillStyle="#1C1811";ctx.fillRect(6,7,1,2);ctx.fillRect(9,7,1,2);
-  ctx.fillRect(6,11,4,1);
-  ctx.fillStyle=s.era===2050?"#2B4C9B":s.era===1920?"#5B4A8A":"#B3402A";ctx.fillRect(3,13,10,3);
+  rect(0,0,16,16,eraSepia?"#D8C49A":"#BFD6E4");
+  if(s.sex==="女性"){rect(3,3,1,10,hairCol);rect(12,3,1,10,hairCol)}
+  rect(4,4,8,8,skin);rect(5,12,6,1,skin);
+  px(3,8,skin);px(12,8,skin);
+  rect(4,2,8,2,hairCol);
+  const style=h1%3;
+  if(style===0)rect(4,4,8,1,hairCol);
+  else if(style===1)rect(4,4,5,1,hairCol);
+  else{rect(4,4,2,1,hairCol);rect(10,4,2,1,hairCol)}
+  if(s.sex==="女性"){if((h1>>>2)%2){rect(3,3,1,6,hairCol);rect(12,3,1,6,hairCol)}}
+  else{rect(3,3,1,3,hairCol);rect(12,3,1,3,hairCol)}
+  const brow="#7A5C40";
+  rect(5,6,2,1,brow);rect(9,6,2,1,brow);
+  const eye="#26201A";
+  rect(5,7,2,2,eye);rect(9,7,2,2,eye);
+  px(6,7,"#FFFFFF");px(10,7,"#FFFFFF");
+  px(8,9,skinDark);
+  if(s.age<40||s.sex==="女性"){px(4,10,"#EEA98F");px(11,10,"#EEA98F")}
+  const ha=(s.stats&&typeof s.stats.ha==="number")?s.stats.ha:60;
+  const mc="#8A4B32";
+  if(s.age<4){rect(7,10,2,1,mc);rect(7,11,2,1,"#C46A52")}
+  else if(ha>=72){px(5,10,mc);px(10,10,mc);rect(6,11,4,1,mc)}
+  else if(ha>=50){px(6,10,mc);px(9,10,mc);rect(7,11,2,1,mc)}
+  else if(ha>=32){rect(7,11,2,1,mc)}
+  else{px(6,11,mc);px(9,11,mc);rect(7,10,2,1,mc)}
+  rect(7,13,2,1,skinDark);
+  const cloth=s.era===2050?"#2B4C9B":s.era===1920?"#5B4A8A":"#B3402A";
+  rect(3,13,4,1,cloth);rect(9,13,4,1,cloth);rect(3,14,10,2,cloth);
 }
 /* ---------- scene engine v2: a living pixel stage ---------- */
 const sceneFx={running:false,raf:0,seasonIdx:0,clouds:[],parts:[],smoke:[],birds:[],confetti:[],walkStart:0,gloomUntil:0,fade:0,snap:null,lastStage:null,lastT:0,smokeT:0,birdT:5000,chimney:null,_age:-1,_cap:"",blinkSeed:1370};
@@ -1721,7 +1752,7 @@ function skyBandsAt(p,era){
 }
 function startScene(){if(sceneFx.running)return;sceneFx.running=true;const loop=(t)=>{if(!sceneFx.running)return;sceneFx.raf=requestAnimationFrame(loop);if(document.hidden)return;if(!sim||!sim.s)return;if($("#birthOverlay"))return;let cv=ui._sceneCv;if(!cv||!document.contains(cv)){cv=$("#sceneCv");ui._sceneCv=cv}if(cv)drawSceneFrame(cv,t)};sceneFx.raf=requestAnimationFrame(loop)}
 function stopScene(){sceneFx.running=false;if(sceneFx.raf)cancelAnimationFrame(sceneFx.raf)}
-function updateSceneHud(s){const a=$("#sceneAge");if(a)a.textContent=s.age;const y=$("#sceneYear");if(y)y.textContent=s.year+"年";const c=$("#sceneCap");if(c)c.textContent=stageLabelOf(s)+" ・ "+seasonOf()+" ・ "+((ERAS.find(e=>e.id===s.era)||{}).label||"")}
+function updateSceneHud(s){const c=$("#sceneCap");if(c)c.textContent=stageLabelOf(s)+" ・ "+seasonOf()+" ・ "+((ERAS.find(e=>e.id===s.era)||{}).label||"")}
 function spawnConfetti(){if(REDUCED)return;for(let i=0;i<16;i++)sceneFx.confetti.push({x:150+Math.random()*180,y:80+Math.random()*70,vx:(Math.random()-0.5)*0.7,vy:0.8+Math.random()*0.9,rot:Math.random()*3,vr:(Math.random()-0.5)*0.25,c:["#B3402A","#B98A2F","#4A6FA5","#5E8C61"][i%4]})}
 function drawHouse(ctx,x,baseY,w,wallH,o){
   o=o||{};const wallTop=baseY-wallH;
@@ -1831,7 +1862,7 @@ function drawSceneFrame(cv,t){
   ctx.fillStyle=gnd;ctx.fillRect(0,GY,W,H-GY);
   ctx.fillStyle="rgba(0,0,0,.07)";for(let i=0;i<60;i++){const n=NOISE[i];ctx.fillRect(Math.round(n[0]*476),GY+4+Math.round(n[1]*(H-GY-10)),3,2)}
   ctx.fillStyle="rgba(255,255,255,.35)";for(let i=60;i<95;i++){const n=NOISE[i];ctx.fillRect(Math.round(n[0]*476),GY+4+Math.round(n[2]*(H-GY-10)),2,2)}
-  ctx.fillStyle="#D9C9A3";ctx.beginPath();ctx.moveTo(228,GY);ctx.lineTo(252,GY);ctx.lineTo(272,H);ctx.lineTo(208,H);ctx.closePath();ctx.fill();
+  const pathCx=stage==="school"?217:stage==="family"?172:stage==="home"?148:stage==="quiet"?166:240;ctx.fillStyle="#D9C9A3";ctx.beginPath();ctx.moveTo(pathCx-12,GY);ctx.lineTo(pathCx+12,GY);ctx.lineTo(pathCx+32,H);ctx.lineTo(pathCx-32,H);ctx.closePath();ctx.fill();
   const glow=dusk||night;
   sceneFx.chimney=null;
   /* ---- stage backdrops ---- */
@@ -1888,7 +1919,7 @@ function drawSceneFrame(cv,t){
   const frame=walking?(Math.floor(wp*8)%2)+1:0;
   const blink=((t+sceneFx.blinkSeed)%3400)>3260;
   const bob=REDUCED?0:Math.sin(t*0.0024)*1.3;
-  const mainX=(stage==="city"?192:stage==="school"?212:200)+walkOff;
+  const mainX=(stage==="city"?192:stage==="school"?217:200)+walkOff;
   const kids=(s.children||[]).map(c=>({c:c,age:s.age-c.bornAge})).filter(k=>k.age>=0&&k.age<17);
   if(s.spouse&&s.spouse.alive){const pc=charConfig(s,"spouse");pc.bob=REDUCED?0:Math.sin(t*0.0024+1.4)*1.3;pc.blink=((t+sceneFx.blinkSeed+900)%3400)>3260;drawPerson(ctx,mainX+54,FGY,pc)}
   kids.slice(0,2).forEach((k,i)=>{const kc={h:Math.min(48,27+k.age*1.8),skin:"#F2C9A0",hair:"#3A2C1E",torso:["#7FB069","#E5B93F"][i%2],pants:"#4A5568",bob:REDUCED?0:Math.sin(t*0.003+i*2)*1.6,blink:false,randoseru:k.age>=6&&k.age<12};drawPerson(ctx,mainX-48-i*30,FGY,kc)});
