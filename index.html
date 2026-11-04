@@ -113,7 +113,7 @@ body.dark canvas.face,body.dark canvas.scene{background:#2A251C}
 .stat .sl{display:flex;justify-content:space-between;font-size:.85rem;font-weight:700}
 .stat .bar{height:9px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:3px}
 .stat .bar>i{display:block;height:100%;border-radius:99px;transition:width .8s var(--ease)}
-.delta-float{position:fixed;z-index:90;font-weight:900;font-size:1.05rem;pointer-events:none;animation:floatUp 1.15s var(--ease) forwards;text-shadow:0 1px 0 var(--paper)}
+.delta-float{position:fixed;z-index:90;font-weight:900;font-size:.85rem;pointer-events:none;animation:floatUp 1.15s var(--ease) forwards;background:var(--paper);border:1px solid var(--line);padding:1px 8px;border-radius:99px;box-shadow:0 2px 8px rgba(60,40,20,.18);white-space:nowrap}
 @keyframes floatUp{0%{opacity:0;transform:translateY(6px)}15%{opacity:1}100%{opacity:0;transform:translateY(-42px)}}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 .kv>span{flex:none;white-space:nowrap}
@@ -2130,27 +2130,27 @@ function doMoneyAction(id){
 /* ---------- log icons: 12x12 pixel glyphs drawn as SVG rects ---------- */
 const IPAL={k:"#38322A",w:"#FFFFFF",W:"#F7F3E8",r:"#DE4A3E",R:"#A82E2A",b:"#4A7FB5",B:"#2F5B8A",c:"#9AD0EC",y:"#F2C94C",Y:"#C9962B",g:"#58A05C",G:"#3A7A44",s:"#F5C9A0",h:"#8A5A33",n:"#C79A63",N:"#7A4A26",p:"#F49FBC",P:"#D96C92",l:"#C9CED8",d:"#7D8496",o:"#F28C38",v:"#8E6BBF",t:"#EFE6CE",e:"#B23A48",K:"#4A4A55"};
 const ICONS={
-sakura:{map:["................",".....kk..kk.....","....kppkkppk....","....kppppppk....","...kkpkyykpkk...","..kpppyyyykppk..","..kppkyyyykppk..","...kkpkyykpkk...","....kppppppk....","....kpkkkkpk....","...kppk..kppk...","...kpk....kpk...","....k......k....","................","................","................"]},
+sakura:{map:["................","................","................",".......k.k......","......kpppk.....",".....kkpppkk....","....kpkkpkkpk...","...kppp.y.pppk..","....ppkyyykpp...","....kkk.y.kkk...","....kpppkpppk...","....kppp.pppk...","......pkkkp.....","......k...k.....","................","................"]},
 randoseru:{map:["................",".....kkkkkk.....","....k......k....","...kkkkkkkkkk...","..krrrrrrrrrrk..","..krRRRRRRRRrk..","..krRrrrrrrRrk..","..krRrrrrrrRrk..","..krRrrYYrrrRk..","..krRrrrrrrRrk..","..krRRRRRRRRrk..","...kkkkkkkkkk...","................","................","................","................"]},
 book:{map:["................","................","...kkkk..kkkk...","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","...kwwwkkwwwk...","....kBBBBBBk....","................","................","................","................"]},
-ball:{map:["................","....kkkkkkkk....","..kkWWWWWWWWkk..",".kWWkWWWWWWkWWk.",".kWRkWWWWWWkRWk.","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk",".kWRkWWWWWWkRWk.",".kWWkWWWWWWkWWk.","..kkWWWWWWWWkk..","....kkkkkkkk....","................","................","................"]},
+ball:{map:["................","....kkkkkkkk....","...kWWWWWWWWk...","..kWWWWWWWWWWk..",".kWWrWWWWWWrWWk.",".kWWWrWWWWrWWWk.",".kWWWrWWWWrWWWk.",".kWWWWrWWrWWWWk.",".kWWWWrWWrWWWWk.",".kWWWrWWWWrWWWk.",".kWWWrWWWWrWWWk.",".kWWrWWWWWWrWWk.","..kWWWWWWWWWWk..","...kWWWWWWWWk...","....kkkkkkkk....","................"]},
 cap:{map:["................","................",".....kkkkkk.....","...kkkkkkkkkk...",".kkkkkkkkkkkkkk.","...kkkkkkkkkk.y.","....kkkkkkkk.y..",".....kddddk.y...",".....kddddk.....","...kkkkkkkkkk...","...kwwwwwwwwk...","...kkkkkkkkkk...","................","................","................","................"]},
-brief:{map:["................","................",".....kkkkkk.....","....k......k....","....kk....kk....","..kkkkkkkkkkkk..","..knnnnnnnnnnk..","..knnnnnnnnnnk..","..knnkYYknnnnk..","..knnnnnnnnnnk..","..knnnnnnnnnnk..","..kkkkkkkkkkkk..","................","................","................","................"]},
-heart:{map:["................","................","..kkkk....kkkk..",".krrrrk..krrrrk.",".krwwrrkkrrrrrk.","krwwwwrrrrrrrrrk","krwwwrrrrrrrrrrk",".krrrrrrrrrrrrk.","..krrrrrrrrrrk..","...krrrrrrrrk...","....krrrrrrk....",".....krrrrk.....","......krrk......",".......kk.......","................","................"]},
+brief:{map:["................","................",".....kkkkkk.....","....k......k....","....kk....kk....","..kkkkkkkkkkkk..","..knnnnnnnnnnk..","..kNNNNNNNNNNk..","..knnnnYYnnnnk..","..knnnnnnnnnnk..","..knnnnnnnnnnk..","..kkkkkkkkkkkk..","................","................","................","................"]},
+heart:{map:["................","................","..kkkk....kkkk..",".krrrrk..krrrrk.",".krwwrrkkrrrrrk.","krwwwrrrrrrrrrrk","krwrrrrrrrrrrrrk",".krrrrrrrrrrrrk.","..krrrrrrrrrrk..","...krrrrrrrrk...","....krrrrrrk....",".....krrrrk.....","......krrk......",".......kk.......","................","................"]},
 ring:{map:["................","......kcck......",".....kcccck.....","....kcKccKck....",".....kcccck.....","......kyyk......","....kyyyyyyk....","...kyykkkyykk...","..kyyk....kyyk..","..kyk......kyk..","..kyyk....kyyk..","...kyykkkyykk...","....kyyyyyyk....","................","................","................"]},
-stroller:{map:["................","....kkkkkk......","..kkppppppkk....",".kppppppppppk...",".kpppppppppppk..","..kkppppppppk...","....kkkkkkkkkk..","......kkkkkk....","....kk......kk..","...kllk....kllk.","...klkk....klkk.","....kk......kk..","................","................","................","................"]},
+stroller:{map:["................",".............kk.","...kkkkkkkk..k..","..kppppppppk....",".kppppppppppk...",".kPPppppppppk...","..kppppppppk....","...kkkkkkkkk....","....k......k....","...kkk.....kkk..","..kKKKk...kKKKk.","..kKlKk...kKlKk.","...kkk.....kkk..","................","................","................"]},
 house:{map:["................",".......kk.......","......krrk......",".....krrrrk.....","....krrrrrrk....","...krrkrrkrrk...","..krrrrrrrrrrk..","....kkkkkkkk....","....kWWWWWWk....","....kWkkWnnk....","....kWWWWnnk....","....kWWWWnnk....","...kkkkkkkkkk...","..kggggggggggk..","................","................"]},
 hospital:{map:["................","................","..kkkkkkkkkkkk..","..kWWWWWWWWWWk..","..kWWWWrrWWWWk..","..kWWWWrrWWWWk..","..kWWrrrrrrWWk..","..kWWrrrrrrWWk..","..kWWWWrrWWWWk..","..kWWWWrrWWWWk..","..kWWWWWWWWWWk..","..kkkkkkkkkkkk..","................","................","................","................"]},
 coin:{map:["................","....kkkkkkkk....","...kyyyyyyyyk...","..kyyyyyyyyyyk..",".kyyYYyyyyYYyyk.",".kyyyYYyyYYyyyk.",".kyyyyYYYYyyyyk.",".kyyyYYYYYYyyyk.",".kyyyyyYYyyyyyk.",".kyyyYYYYYYyyyk.","..kyyyyyyyyyyk..","...kyyyyyyyyk...","....kkkkkkkk....","................","................","................"]},
-train:{map:["................","................","....kkkkkkkk....","..kkkkkkkkkkkk..","..kWWWWWWWWWWk..","..kcccccccccck..","..kcckcccckcck..","..kcccccccccck..","..kWWWWWWWWWWk..","..kWWWWWWWWWWk..","..kWyWWWWWWyWk..","..kkkkkkkkkkkk..","...kkk....kkk...","................","................","................"]},
+train:{map:["................","................","....kkkkkkkk....","..kkkkkkkkkkkk..","..kWWWWWWWWWWk..","..kcccccccccck..","..kcckcccckcck..","..kcccccccccck..","..kWWWWWWWWWWk..","..kWWWWWWWWWWk..","..kWyWWWWWWyWk..","..kkkkkkkkkkkk..","...kkk....kkk...","..dddddddddddd..","................","................"]},
 candle:{map:["................",".......oo.......","......oyyo......","......oyyo......",".......kk.......",".....kkkkkk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....","....kkkkkkkk....",".kyyyyyyyyyyyyk.","...kkkkkkkkkk..."]},
 gift:{map:["................","....kkk..kkk....","...kyyk..kyyk...","...kyykkkyyk....","....kyyyyyk.....","..kkkkkyykkkkk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","...kkkkkkkkkk...","................","................","................","................"]},
 dog:{map:["................","................","..kk........kk..",".khhk......khhk.",".khhkkkkkkkkhhk.","..khhhhhhhhhhk..","..khkkhhhhkkhk..","..khhhhhhhhhhk..","...khhkkkkhhk...","...khkwwwwkhk...","....kkhkkhkk....",".....khrrhk.....",".......kk.......","................","................","................"]},
 storm:{map:["................","................",".....kkkk.......","....kllllkkk....","..kkllllllllk...",".klllllllllllk..",".klllllllllllk..",".klllllllllldk..","..kkkkkkkkkkkk..","......kYYk......",".....kYYk.......","....kYYkk.......",".....kYYk.......","....kYYk........","....kkk.........","................"]},
 tea:{map:["....d...d...d...","...d...d...d....","....d...d...d...","................","..kkkkkkkkkkk...","..kWggggggWWkk..","..kWWWWWWWWk.k..","..kWWWWWWWWkkk..","...kWWWWWWk.k...","....kkkkkkk.....","................","..kkkkkkkkkkk...","...kkkkkkkkk....","................","................","................"]},
-broken:{map:["................","................","..kkkk....kkkk..",".krrrrk..krrrrk.",".krwwrrkkrrrrrk.","krwwwwrrwrrrrrrk",".krrrrrwrrrrrrk.","..krrrrwrrrrrk..","...krrrwrrrrk...","....krrwrrrk....",".....krwrrk.....","......kwrk......",".......kk.......","................","................","................"]},
+broken:{map:["................","................","..kkkk..........",".krrrrk...kkkk..",".krwwrrk.krrrrk.","krwwwwrk.krrrrk.","krwwwrk.krrrrrrk",".krrrrk.krrrrrrk","..krrrk.krrrrrk.","...krrrk.krrrk..","....krrk.krrk...",".....krk.krk....","......kk.kk.....",".......kkk......","................","................"]},
 phone:{map:["................","................","....kkkkkkkk....","....kddddddk....","....dkcccccdk...","....kdcwwccdk...","....kdcwcccdk...","....kdcccccdk...","....kdcccccdk...","....kdcwwccdk...","....kddddddk....","....kkkllkkk....","....kkkkkkkk....","................","................","................"]},
-baby:{map:["................",".....kkkkkk.....","...kkppppppkk...","..kppppppppppk..","..kppkkkkkkppk..",".kppksssssskppk.",".kppksssssskppk.",".kppksksskskppk.",".kppksssssskppk.",".kppkssrrsskppk.","..kkppkkkkppkk..","...kkppppppkk...","....kkkkkkkk....","................","................","................"]}
+baby:{map:["................",".....kkkkkk.....","...kkppppppkk...","..kppppppppppk..","..kppkkkkkkppk..",".kppksssssskppk.",".kppksssssskppk.",".kppksksskskppk.",".kppkpssspskppk.",".kppksssrrskppk.","..kkppkkkkppkk..","...kkppppppkk...","....kkkkkkkk....","................","................","................"]}
 };
 const _iconCache={};
 function svgIcon(name){
@@ -2231,7 +2231,7 @@ function showDeltas(deltas){
   }
   if(sim&&sim.s)ui.prevStats=Object.assign({},sim.s.stats);
   if(REDUCED)return;
-  for(const k in deltas){if(!deltas[k])continue;const hostEl=$("#statVal-"+k);if(!hostEl)continue;const r=hostEl.getBoundingClientRect();const el=document.createElement("div");el.className="delta-float";el.style.left=r.left+"px";el.style.top=(r.top-6)+"px";el.style.color=deltas[k]>0?"#3F7D2C":"#C0392B";el.textContent=statName(k)+" "+(deltas[k]>0?"+":"−")+Math.abs(deltas[k]);document.body.appendChild(el);setTimeout(()=>el.remove(),1200)}
+  for(const k in deltas){if(!deltas[k])continue;const hostEl=$("#statVal-"+k);if(!hostEl)continue;const r=hostEl.getBoundingClientRect();const el=document.createElement("div");el.className="delta-float";el.style.left=(r.right+8)+"px";el.style.top=(r.top-4)+"px";el.style.color=deltas[k]>0?"#3F7D2C":"#C0392B";el.textContent=statName(k)+" "+(deltas[k]>0?"+":"−")+Math.abs(deltas[k]);document.body.appendChild(el);setTimeout(()=>el.remove(),1200)}
 }
 /* ---------- game loop v3: dwell by year TYPE, matching the original's measured model ----------
    Original (measured over 3 lives at 1x): quiet year ≈11.8s, milestone year ≈21.4s,
@@ -2490,7 +2490,7 @@ const wOf=p=>(PREFS.find(x=>x[0]===p)||[p,0])[1];
 const rankOf=p=>PREFS.slice().sort((a,b)=>b[1]-a[1]).findIndex(x=>x[0]===p)+1;
 const compTable='<div class="kv"><span>生まれた都道府県</span><b>'+esc(s.birthPref)+'（出生割合 '+wOf(s.birthPref)+'%・'+rankOf(s.birthPref)+'位）</b></div>'
 +(myPref?'<div class="kv"><span>あなたの都道府県</span><b>'+esc(myPref)+'（出生割合 '+wOf(myPref)+'%・'+rankOf(myPref)+'位）</b></div>':"")
-+'<div class="kv"><span>この時代の平均寿命の目安（ゲーム内設定）</span><b>約'+s.le+'歳 ／ 享年 '+sum.deathAge+'歳</b></div>'
++'<div class="kv"><span>平均寿命の目安（この時代）</span><b>約'+s.le+'歳</b></div>'+'<div class="kv"><span>あなたの享年</span><b>'+sum.deathAge+'歳</b></div>'
 +'<p class="small">※出生割合は厚生労働省「人口動態統計」（2024年確定数）の都道府県別出生数にもとづきます。</p>';
 const moshimoList=s.choiceLog.length?'<div class="pills">'+s.choiceLog.map((c,i)=>'<button class="pill" data-moshimo="'+i+'">'+c.age+'歳「'+esc(c.label)+'」</button>').join("")+'</div><div id="moshimoResult" style="margin-top:12px"></div><p class="small">選ぶと、同じ始まりでその決断だけを変えた人生を再計算し、差分を表示します（お金の操作は再現に含まれません）。</p>':'<p class="small">この人生では決断の記録がありません。</p>';
 const leDiff=sum.deathAge-s.le;
@@ -2517,7 +2517,7 @@ app.innerHTML='<div class="wrap"><div class="card ending-hero"><div class="end-k
 +'<div class="kv"><span>子ども / 孫</span><b>'+sum.children+'人 / '+sum.grandchildren+'人</b></div>'
 +'<div class="kv"><span>住まい</span><b>'+esc(sum.residence)+'</b></div>'
 +'<div class="kv"><span>純資産</span><b>'+sum.net.toLocaleString()+'万円（貯金 '+sum.savings.toLocaleString()+' / 投資 '+sum.invest.toLocaleString()+'）</b></div>'
-+'<div class="kv"><span>状態</span><b>健康 '+sum.stats.he+' ・ 幸福 '+sum.stats.ha+' ・ 知識 '+sum.stats.kn+' ・ 人間関係 '+sum.stats.re+'</b></div></div>'
++'<div class="kv"><span>状態</span><b>健康 '+sum.stats.he+' ・ 幸福 '+sum.stats.ha+'<br>知識 '+sum.stats.kn+' ・ 人間関係 '+sum.stats.re+'</b></div></div>'
 +'<div class="panel card"><h3 class="mincho">数字で比べる</h3>'+compTable+'</div>'
 +'<div class="panel card"><h3 class="mincho">数字で見るこの人生</h3>'+statsPanel+'</div>'
 +'<div class="panel card"><h3 class="mincho">走馬灯</h3>'+(sum.hito5?'<p class="small" style="margin-bottom:6px">5歳のあなたは「'+esc(sum.hito5)+'」が楽しいと言っていた。</p>':"")+digest+'</div>'
