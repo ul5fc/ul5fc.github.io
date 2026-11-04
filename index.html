@@ -123,7 +123,7 @@ body.dark canvas.face,body.dark canvas.scene{background:#2A251C}
 .logtools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .chip{border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:.8rem;font-weight:700;background:var(--paper2);min-height:38px}
 .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.logentry{position:relative;padding:9px 38px 9px 12px;border-radius:12px;margin:6px 0;background:var(--paper2);border:1px solid var(--line);cursor:pointer;line-height:1.6}
+.logentry{position:relative;padding:9px 38px 9px 12px;border-radius:12px;margin:6px 0;background:var(--paper2);border:1px solid var(--line);border-left:5px solid transparent;cursor:pointer;line-height:1.6}
 .logentry .starbtn{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;color:var(--ink2);font-size:1.05rem;line-height:1;display:flex;align-items:center;justify-content:center}
 .logentry .starbtn.on{color:var(--gold)}
 .logentry .chev{position:absolute;right:12px;bottom:6px;font-size:.68rem;color:var(--ink2);opacity:.75;pointer-events:none}
@@ -132,7 +132,7 @@ body.dark canvas.face,body.dark canvas.scene{background:#2A251C}
 .logentry .part .pk{flex:none;align-self:flex-start;font-size:.66rem;font-weight:700;letter-spacing:.06em;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 8px;margin-top:2px}
 .logentry.newest{background:var(--newhl)}
 .logentry{display:flex;gap:8px;align-items:flex-start}
-.logentry .ic{flex:none;width:19px;height:19px;margin-top:1px}
+.logentry .ic{flex:none;width:19px;height:19px;margin-top:4px}
 .logentry .ic svg{display:block}
 .logentry .logmain{flex:1;min-width:0}
 .p-major{font-weight:700}
@@ -2042,7 +2042,7 @@ function renderPlay(){
   +'<div class="card"><h3 class="mincho" style="margin-bottom:6px;font-size:.95rem">今年の重点（6歳から）</h3><div class="focus-sel" id="focusSel"></div>'
   +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生地図（1マス＝1年）</h3><div class="mapgrid" id="mapGrid"></div>'
   +'<p class="small" style="margin-top:8px">この時代の平均寿命の目安：約'+s.le+'歳</p>'
-  +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生の図鑑</h3><div class="kv"><span>集めたしるし</span><b>'+Object.keys(META.badges).length+' / 60</b></div><div class="badge-progress" style="margin:4px 0 2px"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small">しるしは人生を終えると増えます。図鑑は最初の画面で見られます。</p></div>\' + \'<div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">生存曲線（同じ時代に生まれた人）</h3><canvas id="curveCv" width="660" height="250" style="width:100%;height:auto;display:block"></canvas><p class="small" id="curveNote" style="margin-top:6px"></p></div>\' + \'</div>'
+  +'<h3 class="mincho" style="margin:14px 0 4px;font-size:.95rem">人生の図鑑</h3><div class="kv"><span>集めたしるし</span><b>'+Object.keys(META.badges).length+' / 60</b></div><div class="badge-progress" style="margin:4px 0 2px"><i style="width:'+Math.round(Object.keys(META.badges).length/60*100)+'%"></i></div><p class="small">しるしは人生を終えると増えます。図鑑は最初の画面で見られます。</p></div>' + '<div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">生存曲線（同じ時代に生まれた人）</h3><canvas id="curveCv" width="660" height="250" style="width:100%;height:auto;display:block"></canvas><p class="small" id="curveNote" style="margin-top:6px"></p></div>' + '</div>'
   +'<div class="col active" data-col="log">'
   +'<div class="scene-wrap" id="sceneWrap"><canvas class="scene" id="sceneCv" width="480" height="300" role="img" aria-label="いまの場面"></canvas>'
   +'<div class="scene-cap" id="sceneCap"></div><div class="scene-tap">タップで次の年へ</div></div>'
@@ -2167,30 +2167,30 @@ function svgIcon(name){
 }
 const ICON_RULES=[
 ["candle",/亡くな|亡き|訃報|永眠|息を引き取|死去/],
-["stroller",/第一子|人目の子|孫が|子どもが生まれ|出産|双子/],
+["stroller",/第一子|人目の子|孫が|孫の|子どもが生まれ|子が生まれ|出産|双子|子を迎える|赤ちゃん/],
 ["ring",/結婚/],
 ["broken",/離婚|別れ|破局/],
-["hospital",/病気|入院|がん|手術|治療|介護|健康診断|寝込|薬を|再検査/],
-["storm",/地震|台風|大雨|停電|大雪|猛暑|災害|豪雨|吹雪/],
-["gift",/祭|祝い|七五三|成人式|還暦|喜寿|米寿|白寿|金婚式|銀婚式|誕生日/],
-["train",/電車|通学|バス|旅行|帰省|温泉|出かけ|訪ね|免許|新幹線|島を出/],
-["randoseru",/小学校|ランドセル|小学生/],
+["hospital",/病気|入院|がん|手術|治療|介護|健康診断|寝込|薬を|再検査|リハビリ|人間ドック|健診|体調は完全には戻らない/],
+["storm",/地震|台風|大雨|停電|大雪|猛暑|災害|豪雨|吹雪|梅雨|夕立|初雪|木枯らし/],
+["gift",/祭|祝い|七五三|成人式|還暦|喜寿|米寿|白寿|金婚式|銀婚式|誕生日|成人を迎える|成人した/],
+["train",/電車|通学|バス|旅行|帰省|温泉|出かけ|訪ね|免許|新幹線|島を出|遠足|車を買|マイカー/],
+["randoseru",/小学校|ランドセル|小学生|学校行事/],
 ["cap",/大学|卒業|合格|受験|専門学校|浪人|進学/],
-["book",/中学|高校|勉強|テスト|宿題|図書|読書|資格|一夜漬け/],
-["ball",/部活|大会|運動会|サッカー|野球|水泳|体操|ジム|運動|スポーツ|マラソン/],
-["heart",/恋人|好きな人|恋|告白|デート|付き合|交際/],
+["book",/中学|高校|勉強|テスト|宿題|図書|読書|資格|一夜漬け|絵を描く|図鑑/],
+["ball",/部活|大会|運動会|サッカー|野球|水泳|体操|ジム|運動|スポーツ|マラソン|散歩|ウォーキング/],
+["heart",/恋人|好きな人|恋|告白|デート|付き合|交際|同窓会|子どもの成長|子の成長/],
 ["dog",/犬|猫|ペット/],
-["phone",/スマホ|携帯電話|SNS/],
-["coin",/年収|貯金|貯蓄|借金|遺産|年金|ローン|退職金|給料|金欠|投資|ふるさと納税/],
-["house",/家を買|持ち家|引っ越|一人暮らし|実家|地元|Uターン|新居/],
-["brief",/就職|転職|会社|仕事|昇進|退職|職場|アルバイト|転勤|後輩|同期/],
-["baby",/生まれる|夜泣き|歩けるように|つかまり立ち/]];
+["phone",/スマホ|携帯電話|SNS|電話で|電話を/],
+["coin",/年収|貯金|貯蓄|借金|遺産|年金|ローン|退職金|給料|金欠|投資|ふるさと納税|老後の資金|老後資金/],
+["house",/家を買|持ち家|引っ越|一人暮らし|実家|地元|Uターン|新居|住宅のことを考え|マイホーム/],
+["brief",/就職|転職|会社|仕事|昇進|退職|職場|アルバイト|転勤|後輩|同期|定年|引退|残業|働き方/],
+["baby",/生まれる|夜泣き|歩けるように|つかまり立ち|歩き始める|言葉を話し始め|保育園|幼稚園/]];
 function iconFor(e){
   if(e&&e.kind==="birth")return "baby";
   const t=(e&&(e.txt||e.text))||(e&&e.parts?e.parts.map(p=>p.t||"").join(""):"");
   for(const [n,re] of ICON_RULES)if(re.test(t))return n;
   if(e&&e.kind==="hitoiki")return "tea";
-  if(typeof sim!=="undefined"&&sim&&sim.s&&sim.s.age>=65)return "tea";
+  if(e&&typeof e.age==="number"&&e.age>=65)return "tea";
   return "sakura";
 }
 function styledParts(e){
