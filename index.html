@@ -2125,9 +2125,9 @@ function doMoneyAction(id){
 }
 /* ---------- log icons: 12x12 pixel glyphs drawn as SVG rects ---------- */
 const ICONS={
-sakura:{pal:{P:"#D95F83",p:"#F2A7BE",Y:"#F2C14E"},map:["..PP....PP..",".PppP..PppP.",".PpppPPpppP.","..pppppppp..","..ppYYYYpp..",".PppYYYYppP.",".PppppppppP.","..pppppppp..","...pp..pp...","....P..P...."]},
+sakura:{pal:{P:"#D95F83",p:"#F2A7BE",Y:"#F2C14E"},map:["....P..P....","...PPPPPP...","..PPppppPP..","..PppppppP..",".PPppYYppPP.",".PpppYYpppP.","..PppppppP..","..PPppppPP..","...Pp..pP...","....P..P...."]},
 train:{pal:{B:"#4A6FA5",W:"#DCE9F2",D:"#2E2A26",R:"#B3402A"},map:["..BBBBBBBB..","..BWWWWWWB..","..BWWWWWWB..","..BBBBBBBB..","..BRRRRRRB..","..BBBBBBBB..","...D....D...","..D......D.."]},
-ball:{pal:{W:"#F2EEE2",R:"#C0392B"},map:["...WWWWWW...","..WWWWWWWW..",".WWRWWWRWW..",".WRWWWWWRW..","WWWWWWWWWW..","WWWWWWWWWW..",".WRWWWWWRW..",".WWRWWWRWW..","..WWWWWWWW..","...WWWWWW..."]},
+ball:{pal:{W:"#F2EEE2",R:"#C0392B"},map:["...WWWWWW...","..WWWWWWWW..",".WRWWWWRRW..",".WRWWWWRRW..","WWWWWWWWWWWW","WWWWWWWWWWWW",".WRWWWWRRW..",".WRWWWWRRW..","..WWWWWWWW..","...WWWWWW..."]},
 book:{pal:{B:"#7E2A20",P:"#F5EFE0",b:"#4A6FA5",R:"#B98A2F"},map:["..BBBB......","..BPPPB.....","..BPbPPB....","..BPPPPB....","..BPbPPBR...","..BPPPPB.R..","..BPbPPB....","..BPPPPB....","..BBBBBB...."]},
 school:{pal:{R:"#A85B3A",W:"#EFE5CE",D:"#6B4A2F",F:"#B3402A"},map:[".....F......","....FF......","..RRRRRRRR..",".RRRRRRRRRR.","..WWWWWWWW..","..WWWWWWWW..","..WWDDDDWW..","..WWDDDDWW..","..WWDDDDWW.."]},
 briefcase:{pal:{B:"#8A5A2B",D:"#6B4226",G:"#C9962E"},map:["....DDDD....","...D....D...","..BBBBBBBB..",".BBBBBBBBBB.",".BBBDGGDBBB.",".BBBBBBBBBB.","..BBBBBBBB.."]},
@@ -2137,14 +2137,14 @@ house:{pal:{R:"#A85B3A",W:"#EFE5CE",D:"#6B4A2F"},map:[".....RR.....","....RRRR..
 coin:{pal:{G:"#C9962E",g:"#E7BC55",D:"#8A6A1F"},map:["...GGGGGG...","..GggggggG..","..GgDDDDgG..","..GgD..DgG..","..GgD..DgG..","..GgDDDDgG..","..GggggggG..","...GGGGGG..."]},
 cross:{pal:{R:"#C0392B",W:"#FFFDF7"},map:["..WWWWWWWW..","..WWWRRWWW..","..WWWRRWWW..","..WRRRRRRW..","..WRRRRRRW..","..WWWRRWWW..","..WWWRRWWW..","..WWWWWWWW.."]},
 note:{pal:{N:"#33302A",R:"#B3402A"},map:["......NNNN..","......NRRRN.","......NRRRN.","......N...N.","......N...N.","......N...N.","...NN.N...N.","..NNNN....N.","..NNNNN.....","...NNN......"]},
-globe:{pal:{B:"#4A6FA5",G:"#5E8C61"},map:["...BBBBBB...","..BGBBBBGB..",".BBBBBGGBBB.",".BGGBBBBBBB.",".BBBBBGGBBB.","..BBBGGBB...",".BBBBBBBBBB.","..BBBBBBBB..","...BBBBBB..."]},
+globe:{pal:{B:"#4A6FA5",G:"#5E8C61"},map:["....BBBB....","..BBBBBBBB..",".BGBBBBBBGB.",".BBBBGGBBBB.","BBBGGBBBBBBB","BBBBBBBBGGBB","BBBBBGGBBBBB",".BBBBBBBBBB.",".BBBBGGBBBB.","..BBBBBBBB..","....BBBB...."]},
 flame:{pal:{O:"#D97B2F",Y:"#F2C14E",W:"#FFF3D6"},map:["......O.....",".....OYO....",".....OYYO...","....OYWWYO..","....OYYYYO..","...OYYYYYO..","...OYYYYYO..","....OOOO...."]},
-star:{pal:{G:"#C9962E",g:"#E7BC55"},map:[".....GG.....",".....GG.....","....gGGg....","....gGGg....",".GGgGGGgGG..","..gGGGGg....","...gGGg.....","...gGGg.....","..gG..Gg....","..g....g...."]},
-diamond:{pal:{A:"#7E2A20",a:"#B3502F"},map:[".....AA.....","....AaaA....","....aaaa....","...aaaaaa...","..aaaaaaaa..",".AaaaaaaaaA.","..aaaaaaaa..","...aaaaaa...","....aaaa....",".....AA....."]},
+star:{pal:{G:"#C9962E",g:"#E7BC55"},map:[".....GG.....",".....GG.....","....GggG....",".GGGGGGGGGG.","..GGGGGGGG..","...GGGGGG...","....GGGG....","...GG..GG...","..GG....GG..","..G......G.."]},
+diamond:{pal:{A:"#7E2A20",a:"#B3502F"},map:[".AAAAAAAAAA.","AaaaaAAAAaaA","AAaaaaaaaaAA",".AaaaaaaaaA.","..AaaaaaaA..","...AaaaaA...","....AaaA....",".....AA....."]},
 sprout:{pal:{G:"#4E7A3A",g:"#6FA055"},map:[".....gg.....","....gGGg....","....gGG..g..",".....G..gG..","..g...GG....","..gG..G.....","...gGG......",".....G......",".....G......","....GGG....."]},
 person:{pal:{H:"#4A3B2A",F:"#E8B98A",B:"#4A6FA5"},map:["....HHHH....","...HFFFFH...","...FFFFFF...","...FFFFFF...","....FFFF....","...BBBBBB...","..BBBBBBBB..","..BBBBBBBB..","..BB.BB.BB..","..BB.BB.BB.."]},
 flag:{pal:{P:"#8A7A5C",R:"#B3402A"},map:["..P.........","..PRRRRR....","..PRRRRRR...","..PRRRRR....","..P.........","..P.........","..P.........","..P.........","..P.........","..P........."]},
-cup:{pal:{T:"#7A4A2B",W:"#EDE6D6",w:"#CBBFA5"},map:["............","..WWWWWW....","..WTTTTW.WW.","..WTTTTW...W","..WTTTTW.WW.","..WWWWWW....","............","...WWWWWW...","....wwww...."]}
+cup:{pal:{T:"#7A4A2B",C:"#C0A87E",D:"#8A7A5C"},map:["............",".CCCCCCC....",".CTTTTTC....",".CTTTTTC....",".CTTTTTC....","..CCCCC.....","............","...DDD......","............"]}
 };
 const _iconCache={};
 function svgIcon(name){if(_iconCache[name])return _iconCache[name];const ic=ICONS[name]||ICONS.sprout;let r="";ic.map.forEach((row,y)=>{row.padEnd(12,".").split("").forEach((ch,x)=>{const c=ic.pal[ch];if(c)r+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>'})});const svg='<svg viewBox="0 0 12 12" width="19" height="19" aria-hidden="true" shape-rendering="crispEdges">'+r+"</svg>";_iconCache[name]=svg;return svg}
