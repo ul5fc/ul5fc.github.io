@@ -371,7 +371,7 @@ function toast(msg){const t=$("#toast");if(!t)return;t.textContent=msg;t.classLi
    Only event names are ever sent (lives / finished / era-YYYY / lineage) —
    no personal data, no identifiers. */
 const COUNTER_API="https://eminent-stingray-158680.upstash.io";
-const COUNTER_TOKEN="";
+const COUNTER_TOKEN="gQAAAAAAmvYAAIgcDJINTQ2NWxZDZkNjU0OWF1Ym1JZ2TNmNTg5MGM3NjMzMA";
 function countHit(key){if(!COUNTER_TOKEN)return;try{fetch(COUNTER_API+"/incr/"+encodeURIComponent(key),{headers:{Authorization:"Bearer "+COUNTER_TOKEN},mode:"cors",keepalive:true}).catch(()=>{})}catch(e){}}
 function loadPlayCount(){if(!COUNTER_TOKEN)return;try{fetch(COUNTER_API+"/get/lives",{headers:{Authorization:"Bearer "+COUNTER_TOKEN},mode:"cors"}).then(r=>r.json()).then(j=>{const el=$("#cntPlays");if(el)el.textContent=(parseInt(j.result,10)||0).toLocaleString()}).catch(()=>{})}catch(e){}}
 
