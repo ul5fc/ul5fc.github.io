@@ -131,6 +131,25 @@ body.dark canvas.face,body.dark canvas.scene{background:#2A251C}
 .logentry .part{display:flex;gap:8px;font-size:.87rem;line-height:1.55}
 .logentry .part .pk{flex:none;align-self:flex-start;font-size:.66rem;font-weight:700;letter-spacing:.06em;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 8px;margin-top:2px}
 .logentry.newest{background:var(--newhl)}
+.logentry{display:flex;gap:8px;align-items:flex-start}
+.logentry .ic{flex:none;width:19px;height:19px;margin-top:1px}
+.logentry .ic svg{display:block}
+.logentry .logmain{flex:1;min-width:0}
+.p-major{font-weight:700}
+.p-dec{color:var(--accent);font-weight:700}
+.p-dim{color:var(--ink2)}
+.popline{color:#2F6F6A;font-size:.82rem;line-height:1.55;padding:0 2px 8px}
+body.dark .popline{color:#82B8B0}
+.who-main{display:flex;flex-direction:column}
+.who-age{display:flex;align-items:baseline;gap:2px;flex:none}
+.bignum{font-family:"Shippori Mincho",serif;font-weight:900;font-size:2.45rem;line-height:.95}
+.who-age .sai{font-weight:800;font-size:.95rem}
+.resume-card{border:2px solid var(--ink);padding:18px 18px 14px}
+.rc-kicker{font-size:.72rem;letter-spacing:.16em;color:var(--ink2);font-weight:800}
+.rc-name{font-family:"Shippori Mincho",serif;font-size:1.75rem;font-weight:900;line-height:1.2;margin-top:2px}
+.rc-meta{color:var(--ink2);font-size:.92rem;margin-top:2px}
+.rc-btn{width:100%;margin-top:12px;padding:15px;font-size:1.06rem}
+.rc-sub{margin-top:8px}
 #logBox{max-height:520px;overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:960px){#logBox{max-height:46vh}}
 .logentry.major{border-left:5px solid var(--ink2)}
@@ -211,7 +230,7 @@ body.dark canvas.face,body.dark canvas.scene{background:#2A251C}
 @media(max-width:640px){
   .topbar{padding:6px 0}
   .topbar .who .name{font-size:1rem}
-  .topbar .who .small{display:none}
+  .topbar .who .small{font-size:.72rem}
   .agebar{height:7px;margin-top:4px}
   .ctlbar{margin-top:5px;flex-wrap:wrap;overflow-x:visible}
   .icobtn{width:40px;height:40px}
@@ -379,6 +398,9 @@ function loadPlayCount(){if(!COUNTER_ON)return;try{fetch(COUNTER_API+"/get/"+COU
 /* ---------- data: prefectures ---------- */
 /* 出生ウェイト: 厚生労働省「人口動態統計」2024年確定数の都道府県別出生数（全国計は確定数で686,173人、
    都道府県計）から算出した実際の出生割合（%、合計100に正規化）。 */
+/* Prefecture populations: 2025 census (総務省統計局「令和7年国勢調査」人口等基本集計). */
+const PREF_POP={"北海道":4980272,"青森県":1139461,"岩手県":1124652,"宮城県":2225414,"秋田県":881470,"山形県":992297,"福島県":1710242,"茨城県":2789856,"栃木県":1863329,"群馬県":1865934,"埼玉県":7287325,"千葉県":6257225,"東京都":14236627,"神奈川県":9193922,"新潟県":2067144,"富山県":982147,"石川県":1086596,"福井県":728588,"山梨県":779276,"長野県":1953866,"岐阜県":1889576,"静岡県":3465667,"愛知県":7448043,"三重県":1693225,"滋賀県":1392008,"京都府":2500173,"大阪府":8759312,"兵庫県":5317792,"奈良県":1268181,"和歌山県":863757,"鳥取県":523073,"島根県":628887,"岡山県":1807160,"広島県":2682786,"山口県":1262770,"徳島県":674790,"香川県":906828,"愛媛県":1259907,"高知県":642836,"福岡県":5077785,"佐賀県":780675,"長崎県":1232040,"熊本県":1677302,"大分県":1076353,"宮崎県":1017628,"鹿児島県":1511783,"沖縄県":1466548};
+const POP_TOTAL=122972528;
 const PREFS=[
 ["北海道",3.3],["青森県",0.74],["岩手県",0.71],["宮城県",1.64],["秋田県",0.48],["山形県",0.68],["福島県",1.2],
 ["茨城県",2.04],["栃木県",1.35],["群馬県",1.36],["埼玉県",5.82],["千葉県",4.92],["東京都",12.27],["神奈川県",7.49],
@@ -1494,16 +1516,43 @@ function saveMeta(){store.set(META_KEY,META)}
 if(META.settings.dark)document.body.classList.add("dark");
 let sim=null,ui={speed:1,mult:1,paused:false,timer:null,modalTimer:null,filter:"all",order:"new",tab:"log",started:false,autoDelay:null,stageT:[],raf:0,freshFrom:-1,prevStats:null,skipToDec:false,waiting:false,lantern:null,yearDwell:null};
 const REDUCED=(typeof matchMedia!=="undefined")&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-function sfx(kind){if(!META.settings.sfx)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=sfx._c||(sfx._c=new C());const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=kind==="good"?660:kind==="bad"?220:440;g.gain.setValueAtTime(0.06,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.18);o.start();o.stop(ctx.currentTime+0.2)}catch(e){}}
-const BGM={ctx:null,gain:null,timer:null,on:false,step:0};
-const BGM_CHORDS=[[110,164.81,220,261.63],[87.31,130.81,174.61,220],[130.81,196,261.63,329.63],[98,146.83,196,246.94],[110,164.81,220,329.63],[87.31,130.81,174.61,261.63]];
+/* ---------- audio: music-box synthesis engine (no audio files) ----------
+   All sounds are synthesized with WebAudio. Pluck = music-box partials,
+   BGM = bright C-major generative pad + sparse pentatonic plucks. */
+const AU={ctx:null,master:null};
+function auCtx(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;if(!AU.ctx){AU.ctx=new C();AU.master=AU.ctx.createGain();AU.master.gain.value=0.9;AU.master.connect(AU.ctx.destination)}if(AU.ctx.state==="suspended")AU.ctx.resume();return AU.ctx}catch(e){return null}}
+function pluck(f,t,o){o=o||{};const ctx=AU.ctx;if(!ctx)return;const dur=o.dur||1.3,g0=o.gain||0.12,out=o.out||AU.master;
+  for(const pr of [[1,1],[3.98,0.32],[9.24,0.07]]){const os=ctx.createOscillator(),g=ctx.createGain();os.type="sine";os.frequency.value=f*pr[0];g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(g0*pr[1],t+0.004);g.gain.exponentialRampToValueAtTime(0.0008,t+dur*(pr[0]===1?1:0.45));os.connect(g);g.connect(out);os.start(t);os.stop(t+dur+0.05)}
+  const os=ctx.createOscillator(),g=ctx.createGain();os.type="triangle";os.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(g0*0.35,t+0.005);g.gain.exponentialRampToValueAtTime(0.0008,t+dur*0.5);os.connect(g);g.connect(out);os.start(t);os.stop(t+dur*0.6)}
+function noiseBurst(t,o){o=o||{};const ctx=AU.ctx;if(!ctx)return;const dur=o.dur||0.08,len=Math.max(1,(ctx.sampleRate*dur)|0),buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);const s=ctx.createBufferSource();s.buffer=buf;const f=ctx.createBiquadFilter();f.type="bandpass";f.frequency.setValueAtTime(o.from||900,t);if(o.to)f.frequency.exponentialRampToValueAtTime(o.to,t+dur);f.Q.value=o.q||1.1;const g=ctx.createGain();g.gain.value=o.gain||0.10;s.connect(f);f.connect(g);g.connect(AU.master);s.start(t)}
+function bell(f,t,o){o=o||{};const ctx=AU.ctx;if(!ctx)return;const dur=o.dur||3.4,g0=o.gain||0.10;for(const pr of [[1,1],[2.74,0.4],[5.43,0.12]]){const os=ctx.createOscillator(),g=ctx.createGain();os.type="sine";os.frequency.value=f*pr[0];g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(g0*pr[1],t+0.008);g.gain.exponentialRampToValueAtTime(0.0008,t+dur*(pr[0]===1?1:0.5));os.connect(g);g.connect(AU.master);os.start(t);os.stop(t+dur+0.05)}}
+function sfx(kind){if(!META.settings.sfx)return;const ctx=auCtx();if(!ctx)return;const t=ctx.currentTime+0.01;
+  try{
+    if(kind==="tick"){noiseBurst(t,{dur:0.05,from:2400,q:2,gain:0.085});pluck(1567.98,t,{dur:0.25,gain:0.026})}
+    else if(kind==="pop"){const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.setValueAtTime(640,t);o.frequency.exponentialRampToValueAtTime(190,t+0.07);g.gain.setValueAtTime(0.13,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.09);o.connect(g);g.connect(AU.master);o.start(t);o.stop(t+0.1)}
+    else if(kind==="open"){noiseBurst(t,{dur:0.16,from:520,to:1700,gain:0.13})}
+    else if(kind==="close"){noiseBurst(t,{dur:0.13,from:1500,to:480,gain:0.11})}
+    else if(kind==="decide"){pluck(659.25,t,{gain:0.10});pluck(987.77,t+0.09,{gain:0.10})}
+    else if(kind==="good"){[523.25,659.25,783.99].forEach((f,i)=>pluck(f,t+i*0.07,{gain:0.11}))}
+    else if(kind==="bad"){pluck(392.00,t,{gain:0.10});pluck(329.63,t+0.11,{gain:0.10,dur:1.6})}
+    else if(kind==="mile"){[523.25,587.33,659.25,783.99].forEach((f,i)=>pluck(f,t+i*0.06,{gain:0.095}))}
+    else if(kind==="birth"){[523.25,659.25,783.99,1046.50,1318.51].forEach((f,i)=>pluck(f,t+i*0.09,{gain:0.10,dur:1.8}))}
+    else if(kind==="death"){bell(196.00,t,{gain:0.11});bell(98.00,t+0.02,{gain:0.05,dur:4.2})}
+    else if(kind==="star"){pluck(1567.98,t,{gain:0.085,dur:0.9});pluck(2093.00,t+0.05,{gain:0.05,dur:0.8})}
+    else if(kind==="hitoiki"){pluck(587.33,t,{gain:0.08});pluck(880.00,t+0.13,{gain:0.08})}
+    else if(kind==="money"){pluck(987.77,t,{gain:0.085,dur:0.5});pluck(1318.51,t+0.055,{gain:0.085,dur:0.7})}
+  }catch(e){}}
+const BGM={timer:null,on:false,step:0};
+const BGM_CHORDS=[[261.63,329.63,392.00,493.88],[349.23,440.00,523.25,659.25],[220.00,261.63,329.63,392.00],[196.00,246.94,293.66,392.00]];
+const BGM_SCALE=[523.25,587.33,659.25,783.99,880.00,1046.50];
 function bgmChord(){
-  if(!BGM.on||!BGM.ctx)return;const ctx=BGM.ctx,t=ctx.currentTime;const notes=BGM_CHORDS[BGM.step%BGM_CHORDS.length];BGM.step++;
-  for(const f of notes){const o=ctx.createOscillator(),g=ctx.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.045,t+2.8);g.gain.setValueAtTime(0.045,t+4.6);g.gain.linearRampToValueAtTime(0,t+7.4);o.connect(g);g.connect(BGM.gain);o.start(t);o.stop(t+7.5)}
+  if(!BGM.on||!AU.ctx)return;const ctx=AU.ctx,t=ctx.currentTime+0.05;const notes=BGM_CHORDS[BGM.step%BGM_CHORDS.length];BGM.step++;
+  for(const f of notes){for(const det of [0,4]){const o=ctx.createOscillator(),g=ctx.createGain();o.type="triangle";o.frequency.value=f;o.detune.value=det-2;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.026,t+1.9);g.gain.setValueAtTime(0.026,t+4.4);g.gain.linearRampToValueAtTime(0,t+7.0);o.connect(g);g.connect(AU.master);o.start(t);o.stop(t+7.1)}}
+  const n=2+((Math.random()*3)|0);let off=0.4;
+  for(let i=0;i<n;i++){pluck(BGM_SCALE[(Math.random()*BGM_SCALE.length)|0],t+off,{gain:0.042,dur:1.6});off+=0.7+Math.random()*1.6}
+  if(Math.random()<0.3)pluck(BGM_SCALE[(Math.random()*3)|0]*2,t+3.4+Math.random()*2,{gain:0.018,dur:1.2});
 }
-function bgmStart(){
-  if(BGM.on)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;BGM.ctx=BGM.ctx||new C();if(BGM.ctx.state==="suspended")BGM.ctx.resume();BGM.gain=BGM.gain||BGM.ctx.createGain();BGM.gain.gain.value=0.9;BGM.gain.connect(BGM.ctx.destination);BGM.on=true;BGM.step=0;bgmChord();BGM.timer=setInterval(bgmChord,7000)}catch(e){}
-}
+function bgmStart(){if(BGM.on)return;if(!auCtx())return;BGM.on=true;BGM.step=0;bgmChord();BGM.timer=setInterval(bgmChord,6500)}
 function bgmStop(){BGM.on=false;if(BGM.timer){clearInterval(BGM.timer);BGM.timer=null}}
 function statName(k){return{he:"健康",ha:"幸福",kn:"知識",re:"人間関係"}[k]||k}
 function fxHint(ch){
@@ -1515,6 +1564,9 @@ function fxHint(ch){
 }
 function chapterOf(age){return age<=5?"幼少期":age<=18?"学生":age<=29?"若者":age<=49?"社会人":age<=64?"円熟":"老後"}
 const CHAPTERS=["幼少期","学生","若者","社会人","円熟","老後"];
+function fmtSavedAt(ts){const d=new Date(ts);return d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日 "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+function fmtMan(n){return Math.round(n/10000).toLocaleString()+"万"}
+function popLineText(s){const pref=s.residence||s.birthPref;const p=PREF_POP[pref];if(!p)return "";return "いま日本では約"+Math.floor(POP_TOTAL/1e8)+"億"+fmtMan(POP_TOTAL%1e8)+"人が暮らしています。"+pref+"には、あなたのほかに約"+fmtMan(p-1)+"人が暮らしています。（2025年国勢調査）"}
 /* ---------- landing ---------- */
 function renderLanding(){
   bgmStop();
@@ -1550,7 +1602,7 @@ function renderLanding(){
   +(COUNTER_ON?'<div class="box"><div class="num" id="cntPlays">―</div><div class="lbl">のべプレイ回数（実測）</div></div>':"")+'</div>'
   +'<div class="count-note">※上の2つの数字は、このサイトが公開された2026年11月4日 22:34（日本時間）からの経過時間に、年間の出生数・死亡数から換算した割合を掛けた推計値です。実際の人数を数えたものではありません。バーの1周が、それぞれの間隔です。間隔は厚生労働省「人口動態統計」2024年確定数から計算（出生686,173人→約46秒に1人、死亡1,605,378人→約20秒に1人）。'+(COUNTER_ON?'プレイ回数は実際の集計値です。':"")+'</div>'
   +'<div class="nowbaby"><div class="nb-title">いま生まれる赤ちゃんだったら（行き先の割合・2024年出生分布）</div>'+(()=>{const sorted=PREFS.slice().sort((a,b)=>b[1]-a[1]);const mx=sorted[0][1];const mn=sorted[sorted.length-1];return sorted.slice(0,5).map(p=>'<div class="nb-row"><span class="nb-name">'+esc(p[0])+'</span><span class="nb-bar"><i style="width:'+Math.round(p[1]/mx*100)+'%"></i></span><span class="nb-pct">'+p[1]+'%</span></div>').join("")+'<div class="nb-row"><span class="nb-name">'+esc(mn[0])+'</span><span class="nb-bar"><i style="width:'+Math.max(2,Math.round(mn[1]/mx*100))+'%"></i></span><span class="nb-pct">'+mn[1]+'%</span></div><p class="small" style="margin-top:6px">いちばん少ない県でも、約'+Math.round(100/mn[1])+'回に1回は生まれる計算です。</p>'})()+'</div></header>'
-  +(saved&&saved.sim?'<div class="panel card"><h3 class="mincho">続きから</h3><p>'+esc(saved.sim.surname)+' '+esc(saved.sim.given)+'（'+esc(saved.sim.birthPref)+'生まれ）・いま'+saved.sim.age+'歳の人生が保存されています。</p><div class="row" style="margin-top:10px"><button class="btn primary" id="btnResume">続きから生きる</button><button class="btn" id="btnDiscard">この人生を破棄</button></div></div>':"")
+  +(saved&&saved.sim?'<div class="panel card resume-card"><div class="rc-kicker">続きから</div><div class="rc-name">'+esc(saved.sim.surname)+' '+esc(saved.sim.given)+'</div><p class="rc-meta">'+esc(saved.sim.birthPref)+'生まれ ・ いま'+saved.sim.age+'歳'+(saved.savedAt?' ・ '+fmtSavedAt(saved.savedAt)+'に保存':'')+'</p><button class="btn primary rc-btn" id="btnResume">続きから生きる</button><div class="rc-sub"><button class="btn ghost" id="btnDiscard">この人生を破棄</button></div><p class="small" style="margin-top:8px">新しく「生まれる」と、この続きは上書きされます。</p></div>':"")
   +'<div class="panel card"><h3 class="mincho">生まれる時代</h3><div class="era-list" id="eraPills">'+eraCards+'</div>'
   +'<h3 class="mincho">体験の速さ（モード）</h3><div class="mode-list" id="modePills">'+modeCards+'</div>'
   +'<p class="small" style="margin-top:6px">1年の長さは、その年の種類で決まります（静かな年は短く、節目の年は長く）。決断や「ひと息」のあいだは年の時計が止まり、選んだあともその年の残り時間が流れます。プレイ中は場面やログをタップすると次の年へ進めます。</p>'
@@ -1568,7 +1620,7 @@ function renderLanding(){
   +'<div class="panel card"><h3 class="mincho">生まれた都道府県（'+META.prefs.length+' / 47）</h3><div class="prefmap">'+prefMapHtml+'</div><p class="small" style="margin-top:6px">生まれた回数で色が濃くなります。</p></div>'
   +'<div class="panel card"><h3 class="mincho">前世の記録（直近10回）</h3>'+pastHtml+(META.past.length?'<button class="btn ghost" id="btnClearPast">記録をすべて消す</button>':"")+'</div>'
   +'<div class="panel card"><h3 class="mincho">このシミュレーションの中の人たち</h3><p class="small">同じ日に生まれた3人の人生が、あなたの人生のそばに並びます。5歳・15歳・30歳・50歳・70歳では「ひと息」として問いが投げかけられ、答えは最期の場面に残ります。決断は数年後の出来事や最期の迎え方まで連鎖します。</p>'
-  +'<details class="src"><summary>何が実際のデータなのか</summary><p class="small">出生の抽選ウェイトは、厚生労働省「人口動態統計」（2024年確定数）の都道府県別出生数そのものの割合です（東京都12.27%・神奈川県7.49%・大阪府7.78%・愛知県6.63%・埼玉県5.82%・千葉県4.92%・福岡県4.70%・最少は鳥取県と高知県の0.45%）。平均寿命の目安は厚生労働省「生命表」（完全生命表）の男女平均の値で、2050年の平均寿命・出生数・人口見通しは国立社会保障・人口問題研究所「日本の将来推計人口（令和5年推計）」にもとづきます。出生性比は男：女＝105：100として計算しています。死因の構成や時代ごとの死亡率は公的統計の傾向に合わせて調整したモデル値です。作中の人物・出来事は統計をもとにした創作です。</p></details>'
+  +'<details class="src"><summary>何が実際のデータなのか</summary><p class="small">出生の抽選ウェイトは、厚生労働省「人口動態統計」（2024年確定数）の都道府県別出生数そのものの割合です（東京都12.27%・神奈川県7.49%・大阪府7.78%・愛知県6.63%・埼玉県5.82%・千葉県4.92%・福岡県4.70%・最少は鳥取県と高知県の0.45%）。平均寿命の目安は厚生労働省「生命表」（完全生命表）の男女平均の値で、2050年の平均寿命・出生数・人口見通しは国立社会保障・人口問題研究所「日本の将来推計人口（令和5年推計）」にもとづきます。出生性比は男：女＝105：100として計算しています。死因の構成や時代ごとの死亡率は公的統計の傾向に合わせて調整したモデル値です。記録の上部に出る人口の一文は、総務省統計局「令和7年国勢調査」（2025年）の都道府県別人口にもとづきます。作中の人物・出来事は統計をもとにした創作です。</p></details>'
   +'<details class="src" open><summary>つらいときの相談先</summary><p class="small">シミュレーションの中のできごとで気持ちが重くなったときは、ひとりで抱えずに話してみてください。</p><ul class="small tel-list" style="margin-left:18px;margin-top:6px"><li>よりそいホットライン <a href="tel:0120279338">0120-279-338</a>（無料・24時間）</li><li>いのちの電話 <a href="tel:0120783556">0120-783-556</a>（無料・毎日16時〜21時）</li><li>こころの健康相談統一ダイヤル <a href="tel:0570064556">0570-064-556</a>（通話料がかかります）</li><li>24時間子供SOSダイヤル <a href="tel:0120078310">0120-0-78310</a>（無料・24時間・おもに18歳まで）</li></ul><p class="small" style="margin-top:6px">番号をタップすると、そのまま電話をかけられます。ほかの窓口は厚生労働省「<a href="https://www.mhlw.go.jp/mamorouyokokoro/" target="_blank" rel="noopener">まもろうよ こころ</a>」にまとまっています。</p></details>'
   +'<p class="small" style="text-align:center;margin-top:20px">このサイトは世界版の人生シミュレーションに着想を得て、日本の統計で独自に作った個人制作です。</p></div></div>';
   /* counter: births/deaths since this site launched (2026-11-04 22:34 JST).
@@ -1611,7 +1663,7 @@ function startLife(seed,lineage){
    player watches age 0 for ~11-12s (a quiet year's length) before turning 1.
    Without this, the first stepYear fired ~450ms after the card and age 0
    flashed past. Tap-to-advance still skips it (ui.waiting). */
-function beginBirthYear(){
+function beginBirthYear(){sfx("birth");
   if(!sim||sim.s.dead)return;
   if(sim.s.pending){showPending();return}
   const d=isOmakase()?1500/(ui.mult||1):dwellForYear(false);
@@ -1648,7 +1700,7 @@ function resumeLife(){
 }
 function saveGame(){
   if(!sim||sim.s.dead)return;
-  try{store.set(SAVE_KEY,{v:1,sim:sim.s,rngS:sim.rng.s,settings:sim.settings})}catch(e){}
+  try{store.set(SAVE_KEY,{v:1,sim:sim.s,rngS:sim.rng.s,settings:sim.settings,savedAt:Date.now()})}catch(e){}
 }
 /* ---------- birth sequence ---------- */
 function birthSequence(done){
@@ -1961,10 +2013,10 @@ function renderPlay(){
   const s=sim.s;const app=$("#app");
   const idNo=String(hashStr(s.seed||(s.surname+s.given))).padStart(10,"0").slice(0,10);
   app.innerHTML='<div class="wrap">'
-  +'<div class="topbar"><div class="who"><span class="name" id="whoName">'+esc(s.surname)+' '+esc(s.given)+'（'+s.age+'歳・'+s.year+'年）'+(s.generation>1?' <span class="small">家系 第'+s.generation+'代</span>':"")+'</span><span class="small" id="whoSub">'+esc(s.birthPref)+'生まれ ・ '+s.sex+' ・ '+(s.spouse?(s.spouse.alive?"既婚":"死別"):"独身")+'</span></div>'
+  +'<div class="topbar"><div class="who"><div class="who-main"><span class="name" id="whoName">'+esc(s.surname)+' '+esc(s.given)+(s.generation>1?' <span class="small">家系 第'+s.generation+'代</span>':"")+'</span><span class="small" id="whoSub">'+s.year+'年 ・ '+esc(s.birthPref)+'生まれ ・ '+s.sex+' ・ '+(s.spouse?(s.spouse.alive?"既婚":"死別"):"独身")+'</span></div><div class="who-age"><span class="bignum" id="whoAge">'+s.age+'</span><span class="sai">歳</span></div></div>'
   +'<div class="agebar"><i id="ageProg" style="width:'+(s.age/110*100)+'%"></i></div>'
   +'<div class="ctlbar"><button class="icobtn" id="ctlPause" aria-label="一時停止">❚❚</button><button class="icobtn'+(META.settings.bgm?" on":"")+'" id="ctlMusic" aria-label="音楽">♪</button>'
-  +'<div class="seg" id="multSeg">'+[0.5,1,2].map(v=>'<button data-mult="'+v+'"'+(ui.mult===v?' class="on"':"")+'>'+v+'×</button>').join("")+'</div>'
+  +'<div class="seg" id="multSeg">'+[0.5,1,2,4,8].map(v=>'<button data-mult="'+v+'"'+(ui.mult===v?' class="on"':"")+'>'+v+'×</button>').join("")+'</div>'
   +'<button class="txtbtn" id="ctlNextDec">次の決断まで »</button>'
   +'<button class="txtbtn" id="ctlOmakase" aria-pressed="'+!!META.settings.omakase+'">おまかせ</button>'
   +'<span class="ctl-spacer"></span><span class="mode-lbl">'+esc((MODES[sim.settings.mode]||{}).label||"")+'</span>'
@@ -1991,7 +2043,7 @@ function renderPlay(){
   +'<div class="scene-wrap" id="sceneWrap"><canvas class="scene" id="sceneCv" width="480" height="300" role="img" aria-label="いまの場面"></canvas>'
   +'<div class="scene-cap" id="sceneCap"></div><div class="scene-tap">タップで次の年へ</div></div>'
   +'<div class="card" id="logCard"><div class="ftabs">'+[["all","すべて"],["major","大きなできごと"],["decision","決断"],["hitoiki","ひと息"],["star","☆"]].map(f=>'<button data-filter="'+f[0]+'"'+(ui.filter===f[0]?' class="on"':"")+'>'+f[1]+'</button>').join("")+'<span class="sp"></span><button class="order" id="orderBtn">'+(ui.order==="old"?"古い順":"新しい順")+'</button></div>'
-  +'<div id="logBox"></div></div></div>'
+  +'<div class="popline" id="popLine"></div><div id="logBox"></div></div></div>'
   +'<div class="col" data-col="family"><div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">家族と暮らし</h3><div id="familyBox"></div></div>'
   +'<div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">お金</h3><div id="moneyBox"></div><div id="moneyActs"></div></div>'
   +'<div class="card"><h3 class="mincho" style="font-size:.95rem;margin-bottom:6px">同じ日に生まれた人たち</h3><div id="compBox"></div></div></div>'
@@ -1999,7 +2051,7 @@ function renderPlay(){
   +'<div class="bottomtabs"><button data-tab="status">状態</button><button data-tab="log" class="on">記録</button><button data-tab="family">家族・お金</button></div>';
   drawFace($("#faceCv"),s);startScene();updateSceneHud(s);
   $("#ctlPause").addEventListener("click",()=>{ui.paused=!ui.paused;const b=$("#ctlPause");b.textContent=ui.paused?"▶":"❚❚";b.setAttribute("aria-label",ui.paused?"再開":"一時停止");b.classList.toggle("on",ui.paused);if(ui.paused){clearStage();clearInterval(ui.modalTimer)}else if(!sim.s.pending)scheduleYear();else if($("#modalOv"))runModalCountdown();else showPending()});
-  $("#ctlMusic").addEventListener("click",()=>{META.settings.bgm=!META.settings.bgm;saveMeta();const b=$("#ctlMusic");b.classList.toggle("on",META.settings.bgm);if(META.settings.bgm){bgmStart();toast("音楽をオンにしました（静かなコード進行）")}else{bgmStop();toast("音楽をオフにしました")}});
+  $("#ctlMusic").addEventListener("click",()=>{META.settings.bgm=!META.settings.bgm;saveMeta();const b=$("#ctlMusic");b.classList.toggle("on",META.settings.bgm);if(META.settings.bgm){bgmStart();toast("音楽をオンにしました")}else{bgmStop();toast("音楽をオフにしました")}});
   $("#multSeg").addEventListener("click",e=>{const b=e.target.closest("[data-mult]");if(!b)return;const oldMult=ui.mult;ui.mult=parseFloat(b.dataset.mult);document.querySelectorAll("#multSeg button").forEach(x=>x.classList.toggle("on",x===b));
     if(ui.waiting&&ui.dwellInfo&&oldMult!==ui.mult){const now=performance.now();const frac=clamp((ui.dwellInfo.endsAt-now)/Math.max(1,ui.dwellInfo.total),0,1);const newTotal=ui.dwellInfo.total*(oldMult/ui.mult);clearTimeout(ui.timer);ui.dwellInfo={total:newTotal,endsAt:now+frac*newTotal};ui.timer=setTimeout(()=>{ui.waiting=false;ui.dwellInfo=null;scheduleYear()},frac*newTotal)}});
   $("#ctlNextDec").addEventListener("click",()=>{ui.skipToDec=true;toast("次の決断まで早送りします");if(ui.waiting){ui.waiting=false;clearTimeout(ui.timer);scheduleYear()}});
@@ -2069,10 +2121,63 @@ function doMoneyAction(id){
     sim._log(s.age,a.label+"。","money");
     showDeltas(deltas);
   }
-  sfx("good");renderLog();renderSide();saveGame();
+  sfx("money");renderLog();renderSide();saveGame();
 }
+/* ---------- log icons: 12x12 pixel glyphs drawn as SVG rects ---------- */
+const ICONS={
+sakura:{pal:{P:"#D95F83",p:"#F2A7BE",Y:"#F2C14E"},map:["..PP....PP..",".PppP..PppP.",".PpppPPpppP.","..pppppppp..","..ppYYYYpp..",".PppYYYYppP.",".PppppppppP.","..pppppppp..","...pp..pp...","....P..P...."]},
+train:{pal:{B:"#4A6FA5",W:"#DCE9F2",D:"#2E2A26",R:"#B3402A"},map:["..BBBBBBBB..","..BWWWWWWB..","..BWWWWWWB..","..BBBBBBBB..","..BRRRRRRB..","..BBBBBBBB..","...D....D...","..D......D.."]},
+ball:{pal:{W:"#F2EEE2",R:"#C0392B"},map:["...WWWWWW...","..WWWWWWWW..",".WWRWWWRWW..",".WRWWWWWRW..","WWWWWWWWWW..","WWWWWWWWWW..",".WRWWWWWRW..",".WWRWWWRWW..","..WWWWWWWW..","...WWWWWW..."]},
+book:{pal:{B:"#7E2A20",P:"#F5EFE0",b:"#4A6FA5",R:"#B98A2F"},map:["..BBBB......","..BPPPB.....","..BPbPPB....","..BPPPPB....","..BPbPPBR...","..BPPPPB.R..","..BPbPPB....","..BPPPPB....","..BBBBBB...."]},
+school:{pal:{R:"#A85B3A",W:"#EFE5CE",D:"#6B4A2F",F:"#B3402A"},map:[".....F......","....FF......","..RRRRRRRR..",".RRRRRRRRRR.","..WWWWWWWW..","..WWWWWWWW..","..WWDDDDWW..","..WWDDDDWW..","..WWDDDDWW.."]},
+briefcase:{pal:{B:"#8A5A2B",D:"#6B4226",G:"#C9962E"},map:["....DDDD....","...D....D...","..BBBBBBBB..",".BBBBBBBBBB.",".BBBDGGDBBB.",".BBBBBBBBBB.","..BBBBBBBB.."]},
+heart:{pal:{R:"#B3402A",r:"#D96A55"},map:[".RR.....RR..","RrrrR.RrrrR.","RrrrrrrrrrR.","RrrrrrrrrR..",".RrrrrrrrR..","..RrrrrrR...","...RrrrR....","....RRR.....",".....R......"]},
+baby:{pal:{F:"#F2C9A0",H:"#6B4A2F",P:"#E86A92"},map:[".....HH.....","....HFFH....","...FFFFFF...","...FFFFFF...","....FFFF....","..PPPPPPPP..",".PPPPPPPPPP.",".PPPPPPPPPP.","..PPPPPPPP.."]},
+house:{pal:{R:"#A85B3A",W:"#EFE5CE",D:"#6B4A2F"},map:[".....RR.....","....RRRR....","...RRRRRR...","..RWWWWWWR..","..WWWWWWWW..","..WWWDDWWW..","..WWWDDWWW..","..WWWDDWWW.."]},
+coin:{pal:{G:"#C9962E",g:"#E7BC55",D:"#8A6A1F"},map:["...GGGGGG...","..GggggggG..","..GgDDDDgG..","..GgD..DgG..","..GgD..DgG..","..GgDDDDgG..","..GggggggG..","...GGGGGG..."]},
+cross:{pal:{R:"#C0392B",W:"#FFFDF7"},map:["..WWWWWWWW..","..WWWRRWWW..","..WWWRRWWW..","..WRRRRRRW..","..WRRRRRRW..","..WWWRRWWW..","..WWWRRWWW..","..WWWWWWWW.."]},
+note:{pal:{N:"#33302A",R:"#B3402A"},map:["......NNNN..","......NRRRN.","......NRRRN.","......N...N.","......N...N.","......N...N.","...NN.N...N.","..NNNN....N.","..NNNNN.....","...NNN......"]},
+globe:{pal:{B:"#4A6FA5",G:"#5E8C61"},map:["...BBBBBB...","..BGBBBBGB..",".BBBBBGGBBB.",".BGGBBBBBBB.",".BBBBBGGBBB.","..BBBGGBB...",".BBBBBBBBBB.","..BBBBBBBB..","...BBBBBB..."]},
+flame:{pal:{O:"#D97B2F",Y:"#F2C14E",W:"#FFF3D6"},map:["......O.....",".....OYO....",".....OYYO...","....OYWWYO..","....OYYYYO..","...OYYYYYO..","...OYYYYYO..","....OOOO...."]},
+star:{pal:{G:"#C9962E",g:"#E7BC55"},map:[".....GG.....",".....GG.....","....gGGg....","....gGGg....",".GGgGGGgGG..","..gGGGGg....","...gGGg.....","...gGGg.....","..gG..Gg....","..g....g...."]},
+diamond:{pal:{A:"#7E2A20",a:"#B3502F"},map:[".....AA.....","....AaaA....","....aaaa....","...aaaaaa...","..aaaaaaaa..",".AaaaaaaaaA.","..aaaaaaaa..","...aaaaaa...","....aaaa....",".....AA....."]},
+sprout:{pal:{G:"#4E7A3A",g:"#6FA055"},map:[".....gg.....","....gGGg....","....gGG..g..",".....G..gG..","..g...GG....","..gG..G.....","...gGG......",".....G......",".....G......","....GGG....."]},
+person:{pal:{H:"#4A3B2A",F:"#E8B98A",B:"#4A6FA5"},map:["....HHHH....","...HFFFFH...","...FFFFFF...","...FFFFFF...","....FFFF....","...BBBBBB...","..BBBBBBBB..","..BBBBBBBB..","..BB.BB.BB..","..BB.BB.BB.."]},
+flag:{pal:{P:"#8A7A5C",R:"#B3402A"},map:["..P.........","..PRRRRR....","..PRRRRRR...","..PRRRRR....","..P.........","..P.........","..P.........","..P.........","..P.........","..P........."]},
+cup:{pal:{T:"#7A4A2B",W:"#EDE6D6",w:"#CBBFA5"},map:["............","..WWWWWW....","..WTTTTW.WW.","..WTTTTW...W","..WTTTTW.WW.","..WWWWWW....","............","...WWWWWW...","....wwww...."]}
+};
+const _iconCache={};
+function svgIcon(name){if(_iconCache[name])return _iconCache[name];const ic=ICONS[name]||ICONS.sprout;let r="";ic.map.forEach((row,y)=>{row.padEnd(12,".").split("").forEach((ch,x)=>{const c=ic.pal[ch];if(c)r+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>'})});const svg='<svg viewBox="0 0 12 12" width="19" height="19" aria-hidden="true" shape-rendering="crispEdges">'+r+"</svg>";_iconCache[name]=svg;return svg}
+function iconFor(e){const t=e.txt||"";
+  if(e.kind==="birth"||e.age===0)return "baby";
+  if(/亡くな|死去|葬儀|葬式|墓前|看取/.test(t))return "flame";
+  if(/幼なじみ|秘密基地/.test(t))return "sakura";
+  if(e.kind==="history")return "flag";
+  if(/電車|通学|通勤/.test(t))return "train";
+  if(/結婚|婚約|プロポーズ|告白|初恋/.test(t))return "heart";
+  if(/桜/.test(t))return "sakura";
+  if(/入学|卒業|学校|受験|合格|進学|大学|高校|テスト|試験/.test(t))return "school";
+  if(/読書|図書|勉強/.test(t))return "book";
+  if(/野球|サッカー|部活|大会|試合|運動会|マラソン/.test(t))return "ball";
+  if(/就職|転職|退職|起業|会社|仕事/.test(t))return "briefcase";
+  if(/赤ちゃん|出産|生まれてき/.test(t))return "baby";
+  if(/引っ越|上京|家を建|移住|ふるさとに戻|実家/.test(t))return "house";
+  if(/旅行|海外|飛行機|新幹線/.test(t))return "globe";
+  if(/入院|病院|手術|病気|けが|骨折/.test(t))return "cross";
+  if(/給料|貯金|資産|年金|お金|財布|借金/.test(t))return "coin";
+  if(/音楽|歌|ライブ|バンド|ピアノ/.test(t))return "note";
+  if(e.kind==="decision")return "diamond";
+  if(e.kind==="major")return "star";
+  if(e.kind==="hitoiki")return "cup";
+  if(e.kind==="companion")return "person";
+  return "sprout"}
+function styledParts(e){
+  const wrap=(txt,kind)=>{const cls=kind==="decision"?"p-dec":(kind==="major"||kind==="birth")?"p-major":(kind==="history"||kind==="companion")?"p-dim":"";const seg=(kind==="decision"?"▸ ":"")+esc(txt);return cls?'<span class="'+cls+'">'+seg+"</span>":seg};
+  if(e.parts&&e.parts.length){let out="",prevEnd=true;for(const pt of e.parts){out+=(out&&!prevEnd?" ":"")+wrap(pt.txt,pt.kind);prevEnd=/[。！？]$/.test(pt.txt)}return out}
+  return wrap(e.txt,e.kind)}
 function renderLog(){
   const s=sim.s;const box=$("#logBox");if(!box)return;
+  const pl=$("#popLine");if(pl)pl.textContent=popLineText(s);
   let entries=s.log.map((e,i)=>({e:e,i:i}));
   if(ui.filter==="star")entries=entries.filter(x=>x.e.star);
   else if(ui.filter!=="all")entries=entries.filter(x=>{const ks=x.e.kinds||[x.e.kind];return ks.includes(ui.filter)||(ui.filter==="major"&&ks.includes("birth"))});
@@ -2085,15 +2190,16 @@ function renderLog(){
     if(ui.order==="old"&&ch!==lastChapter){html+='<div class="chapter-h">'+ch+'（'+(ch==="幼少期"?"0〜5":ch==="学生"?"6〜18":ch==="若者"?"19〜29":ch==="社会人"?"30〜49":ch==="円熟"?"50〜64":"65〜")+'歳）</div>';lastChapter=ch}
     const parts=e.parts&&e.parts.length>1?e.parts:null;
     const open=parts&&ui.expanded&&ui.expanded[idx];
-    let inner='<span class="age">'+e.age+'歳</span>'+esc(e.txt)+(e.auto?'<span class="auto-tag">'+esc(e.auto)+'</span>':"");
+    let inner='<span class="ic" aria-hidden="true">'+svgIcon(iconFor(e))+'</span><div class="logmain"><span class="age">'+e.age+'歳</span>'+styledParts(e)+(e.auto?'<span class="auto-tag">'+esc(e.auto)+'</span>':"");
     if(parts&&open){
       const KN={norm:"日常",major:"節目",birth:"誕生",decision:"決断",hitoiki:"ひと息",history:"世の中",companion:"同じ日"};
       inner+='<div class="parts">'+parts.map(pt=>'<div class="part"><span class="pk">'+(KN[pt.kind]||"日常")+'</span><span>'+esc(pt.txt)+'</span></div>').join("")+'</div>';
     }
+    inner+='</div>';
     html+='<div class="logentry '+(e.kind||"")+(idx===newestIdx?" newest":"")+(parts?" hasparts":"")+(open?" open":"")+'" data-logidx="'+idx+'">'+inner+'<button class="starbtn'+(e.star?" on":"")+'" data-star="'+idx+'" aria-label="星をつける">'+(e.star?"★":"☆")+'</button>'+(parts?'<span class="chev">'+(open?"▴":"▾")+'</span>':"")+'</div>';
   }
   box.innerHTML=html||'<p class="small">まだ記録がありません。</p>';
-  box.querySelectorAll("[data-star]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();const e2=s.log[parseInt(el.dataset.star,10)];if(e2){e2.star=!e2.star;saveGame();renderLog()}}));
+  box.querySelectorAll("[data-star]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();const e2=s.log[parseInt(el.dataset.star,10)];if(e2){e2.star=!e2.star;if(e2.star)sfx("star");saveGame();renderLog()}}));
   box.querySelectorAll("[data-logidx]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();const e2=s.log[parseInt(el.dataset.logidx,10)];if(e2&&e2.parts&&e2.parts.length>1){ui.expanded=ui.expanded||{};ui.expanded[el.dataset.logidx]=!ui.expanded[el.dataset.logidx];renderLog()}}));
 }
 function showDeltas(deltas){
@@ -2160,7 +2266,9 @@ function stepYear(){
   if(/病|入院|がん|不調|倒れる/.test(joined))sceneFx.gloomUntil=now+9000;
   if(newEntries.some(e=>e.kind==="major"||e.kind==="birth")&&/合格|昇進|結婚|生まれる|優勝|成功|当選/.test(joined))spawnConfetti();
   renderLog();renderSide();renderFocus();
-  const who=$("#whoName");if(who)who.innerHTML=esc(s.surname)+' '+esc(s.given)+'（'+s.age+'歳・'+s.year+'年）'+(s.generation>1?' <span class="small">家系 第'+s.generation+'代</span>':"");
+  const who=$("#whoName");if(who)who.innerHTML=esc(s.surname)+' '+esc(s.given)+(s.generation>1?' <span class="small">家系 第'+s.generation+'代</span>':"");
+  const wa=$("#whoAge");if(wa)wa.textContent=s.age;
+  const ws=$("#whoSub");if(ws)ws.textContent=s.year+'年 ・ '+s.birthPref+'生まれ ・ '+s.sex+' ・ '+(s.spouse?(s.spouse.alive?"既婚":"死別"):"独身");
   showDeltas(s.lastDeltas||{});
   saveGame();
   if(s.dead){ui.timer=setTimeout(fadeToEnding,800);return}
@@ -2169,6 +2277,7 @@ function stepYear(){
      year's last pending resolves. A queue-promotion step (age unchanged) keeps the stash.
      Birth year (0->1, age becomes 1) is milestone class, as on the original. */
   const isMile=newEntries.some(e=>e.kind==="major"||e.kind==="birth")||chapterOf(s.age)!==prevChapter||s.age===1||!!s.pending;
+  if(isMile&&!s.pending)sfx("mile");
   if(s.age!==prevAge){
     if(isOmakase())ui.yearDwell=1500/(ui.mult||1);
     else{ui.yearDwell=dwellForYear(isMile);if(isMile&&sim.settings.mode==="haishin")ui.yearDwell+=3000}
@@ -2199,13 +2308,13 @@ function showChapterCard(s,entries,prevChapter){
   clearTimeout(ui.ccTimer);ui.ccTimer=setTimeout(hideChapterCard,sim.settings.mode==="haishin"?3000:1600);
 }
 function hideChapterCard(){clearTimeout(ui.ccTimer);const d=$("#chapterCard");if(d){d.classList.remove("show");setTimeout(()=>{if(d.parentNode)d.remove()},480)}}
-function fadeToEnding(){
+function fadeToEnding(){sfx("death");
   stopScene();
   const f=document.createElement("div");f.className="fadewhite";document.body.appendChild(f);
   requestAnimationFrame(()=>f.classList.add("on"));
   ui.stageT.push(setTimeout(()=>{showEnding();f.classList.remove("on");ui.stageT.push(setTimeout(()=>{if(f.parentNode)f.remove()},1000))},950));
 }
-function showPending(){
+function showPending(){sfx("decide");
   const s=sim.s;if(!s.pending)return;
   if(isOmakase()){
     ui.autoDelay=setTimeout(()=>{
@@ -2268,8 +2377,10 @@ function showDecisionModal(ev){
   modalShell(html);
   startModalTimer(30,false);
   document.querySelectorAll("[data-ch]").forEach(b=>b.addEventListener("click",()=>{
+    sfx("pop");
     ui.prevStats=Object.assign({},sim.s.stats);
     const res=sim.choose(parseInt(b.dataset.ch,10),"");
+    if(res&&sim.settings.mode!=="haishin"){const _d=res.deltas||{};const _net=(_d.he||0)+(_d.ha||0)+(_d.kn||0)+(_d.re||0);if(_net>0)setTimeout(()=>sfx("good"),130);else if(_net<0||res.ok===false)setTimeout(()=>sfx("bad"),130)}
     if(sim.settings.mode==="haishin"&&res){
       clearInterval(ui.modalTimer);
       const sheet=$("#modalOv .sheet");
@@ -2290,7 +2401,7 @@ function showDecisionModal(ev){
   }));
   $("#modalWait").addEventListener("click",()=>{clearInterval(ui.modalTimer);ui.modalLeft=null;const l=$("#timerLbl");if(l)l.textContent="いつまでも待てます";const f=$("#timerFill");if(f)f.style.width="100%"});
 }
-function showHitoikiModal(h){
+function showHitoikiModal(h){sfx("open");
   const s=sim.s;if(!h)return;
   const opts=(h.age===5&&s.era<1955)?h.optsOld:h.opts;
   const timerHtml=(META.settings.timerOn&&sim.settings.mode!=="haishin")?'<div class="timerwrap"><div class="timerbar gold"><i id="timerFill" style="width:100%"></i></div><div class="small" id="timerLbl">あと15秒で、答えずに進みます</div></div>':"";
@@ -2302,7 +2413,7 @@ function showHitoikiModal(h){
   startModalTimer(15,true);
   document.querySelectorAll("[data-h]").forEach(b=>b.addEventListener("click",()=>{
     sim.answerHitoiki(b.dataset.h==="skip"?null:parseInt(b.dataset.h,10),"");
-    closeModal();sfx("good");renderLog();saveGame();afterPanelResolved();
+    closeModal();sfx("hitoiki");renderLog();saveGame();afterPanelResolved();
   }));
   $("#modalWait").addEventListener("click",()=>{clearInterval(ui.modalTimer);ui.modalLeft=null;const l=$("#timerLbl");if(l)l.textContent="いつまでも待てます";const f=$("#timerFill");if(f)f.style.width="100%"});
 }
@@ -2515,12 +2626,15 @@ if(q!==11800||mi!==21400){rep.pass=false;for(let i=0;i<rep.lines.length;i++)if(r
 document.getElementById("app").innerHTML='<pre id="testReport">'+esc(rep.lines.join("\n"))+'</pre>';
 console.log(rep.lines.join("\n"));
 }else{
+window.addEventListener("pagehide",()=>{try{if(typeof sim!=="undefined"&&sim&&!sim.s.dead&&ui.started)saveGame()}catch(e){}});
+document.addEventListener("click",e=>{const b=e.target.closest?e.target.closest("button"):null;if(!b)return;if(b.classList.contains("choice-btn")||b.closest("#modalOv")||b.id==="btnBirth"||b.id==="btnStartLife")return;sfx("tick")});
 document.addEventListener("visibilitychange",()=>{
   /* Auto-pause while the tab is hidden (the original does the same). The
      previous handler called syncControlBar()/kickTimer(), which never
      existed, so the feature was silently dead behind its try/catch. */
   if(typeof sim==="undefined"||!sim||sim.s.dead||!ui.started)return;
   if(document.hidden){
+    try{saveGame()}catch(e){}
     if(ui.paused||ui.autoPaused||!$("#sceneWrap"))return;
     ui.autoPaused=true;
     clearTimeout(ui.timer);
