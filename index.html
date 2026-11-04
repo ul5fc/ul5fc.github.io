@@ -2124,53 +2124,65 @@ function doMoneyAction(id){
   sfx("money");renderLog();renderSide();saveGame();
 }
 /* ---------- log icons: 12x12 pixel glyphs drawn as SVG rects ---------- */
+const IPAL={k:"#38322A",w:"#FFFFFF",W:"#F7F3E8",r:"#DE4A3E",R:"#A82E2A",b:"#4A7FB5",B:"#2F5B8A",c:"#9AD0EC",y:"#F2C94C",Y:"#C9962B",g:"#58A05C",G:"#3A7A44",s:"#F5C9A0",h:"#8A5A33",n:"#C79A63",N:"#7A4A26",p:"#F49FBC",P:"#D96C92",l:"#C9CED8",d:"#7D8496",o:"#F28C38",v:"#8E6BBF",t:"#EFE6CE",e:"#B23A48",K:"#4A4A55"};
 const ICONS={
-sakura:{pal:{K:"#A63D5E",P:"#E87A9C",p:"#F4B8CB",Y:"#F2C14E"},map:["...KK..KK...","..KPpPPpPK..","..KppppppK..",".KPppYYppPK.","..KppYYppK..","..KppppppK..",".KppKppKppK.","...K....K..."]},
-train:{pal:{B:"#4A6FA5",W:"#DCE9F2",D:"#2E2A26",R:"#B3402A"},map:["..BBBBBBBB..","..BWWWWWWB..","..BWWWWWWB..","..BBBBBBBB..","..BRRRRRRB..","..BBBBBBBB..","...D....D...","..D......D.."]},
-ball:{pal:{o:"#5A5344",W:"#F7F3E8",R:"#C0392B"},map:["...oooooo...","..oWWWWWWo..",".oWRWWWWRWo.",".oWRWWWWRWo.","oWRWWWWWWRWo","oWRWWWWWWRWo",".oWRWWWWRWo.",".oWRWWWWRWo.","..oWWWWWWo..","...oooooo..."]},
-book:{pal:{B:"#7E2A20",P:"#F5EFE0",b:"#4A6FA5",R:"#B98A2F"},map:["..BBBB......","..BPPPB.....","..BPbPPB....","..BPPPPB....","..BPbPPBR...","..BPPPPB.R..","..BPbPPB....","..BPPPPB....","..BBBBBB...."]},
-school:{pal:{o:"#6E5136",W:"#EFE6CE",S:"#7FA6C9",D:"#8A5A34"},map:[".oooooooooo.",".oWWWWWWWWo.",".oWSWSSWSWo.",".oWWWWWWWWo.",".oWSWSSWSWo.",".oWWWDDWWWo.",".oWWWDDWWWo.",".oooooooooo."]},
-briefcase:{pal:{B:"#8A5A2B",D:"#6B4226",G:"#C9962E"},map:["....DDDD....","...D....D...","..BBBBBBBB..",".BBBBBBBBBB.",".BBBDGGDBBB.",".BBBBBBBBBB.","..BBBBBBBB.."]},
-heart:{pal:{R:"#B3402A",r:"#D96A55"},map:[".RR.....RR..","RrrrR.RrrrR.","RrrrrrrrrrR.","RrrrrrrrrR..",".RrrrrrrrR..","..RrrrrrR...","...RrrrR....","....RRR.....",".....R......"]},
-baby:{pal:{F:"#F2C9A0",H:"#6B4A2F",P:"#E86A92"},map:[".....HH.....","....HFFH....","...FFFFFF...","...FFFFFF...","....FFFF....","..PPPPPPPP..",".PPPPPPPPPP.",".PPPPPPPPPP.","..PPPPPPPP.."]},
-house:{pal:{o:"#7A4A2B",R:"#B3502F",W:"#EFE3CC",D:"#7A4A2B"},map:[".....oo.....","....oRRo....","...oRRRRo...","..oRRRRRRo..",".oWWWWWWWWo.","..oWWWWWWo..","..oWWDDWWo..","..oWWDDWWo..","...oooooo..."]},
-coin:{pal:{G:"#C9962E",g:"#E7BC55",D:"#8A6A1F"},map:["...GGGGGG...","..GggggggG..","..GgDDDDgG..","..GgD..DgG..","..GgD..DgG..","..GgDDDDgG..","..GggggggG..","...GGGGGG..."]},
-cross:{pal:{R:"#C0392B",W:"#FFFDF7"},map:["..WWWWWWWW..","..WWWRRWWW..","..WWWRRWWW..","..WRRRRRRW..","..WRRRRRRW..","..WWWRRWWW..","..WWWRRWWW..","..WWWWWWWW.."]},
-note:{pal:{N:"#33302A",R:"#B3402A"},map:["......NNNN..","......NRRRN.","......NRRRN.","......N...N.","......N...N.","......N...N.","...NN.N...N.","..NNNN....N.","..NNNNN.....","...NNN......"]},
-globe:{pal:{o:"#33506E",B:"#4A6FA5",G:"#5E8C61"},map:["....oooo....","..oBBBBBBo..",".oGGBBBBGGo.",".oBBBBBBBBo.","oBBBBBBBBBBo",".oBBBGGBBBo.",".oBBBBBBBBo.","..oBBBBBBo..","....oooo...."]},
-flame:{pal:{f:"#C05E1E",F:"#E8923A",Y:"#F6D365"},map:[".....ff.....","....fFFf....","....fFFf....","...fFFFFf...","..fFFYYFFf..","..fFYYYYFf..","..fFFFFFFf..","...fFFFFf...","....FFFF...."]},
-star:{pal:{G:"#D9A92E",g:"#A87B1F"},map:[".....GG.....",".....GG.....","....GGGG....",".GGGGGGGGGG.","..GGGGGGGG..","...GGGGGG...","....GGGG....","...GG..GG...","..gg....gg..",".gg......gg."]},
-diamond:{pal:{A:"#7E2A20",a:"#B3502F"},map:[".AAAAAAAAAA.","AaaaaAAAAaaA","AAaaaaaaaaAA",".AaaaaaaaaA.","..AaaaaaaA..","...AaaaaA...","....AaaA....",".....AA....."]},
-sprout:{pal:{G:"#4E7A3A",g:"#7FB069",S:"#8A6A42"},map:["..gg....gg..",".gGGg..gGGg.","..gGGGGGGg..",".....GG.....",".....GG.....","....GGGG....","..SSSSSSSS..",".SSSSSSSSSS."]},
-person:{pal:{H:"#4A3B2A",F:"#E8B98A",B:"#4A6FA5"},map:["....HHHH....","...HFFFFH...","...FFFFFF...","...FFFFFF...","....FFFF....","...BBBBBB...","..BBBBBBBB..","..BBBBBBBB..","..BB.BB.BB..","..BB.BB.BB.."]},
-flag:{pal:{P:"#8A7A5C",R:"#B3402A"},map:["..P.........","..PRRRRR....","..PRRRRRR...","..PRRRRR....","..P.........","..P.........","..P.........","..P.........","..P.........","..P........."]},
-cup:{pal:{T:"#7A4A2B",C:"#C0A87E",D:"#8A7A5C"},map:["............",".CCCCCCC....",".CTTTTTC....",".CTTTTTC....",".CTTTTTC....","..CCCCC.....","............","...DDD......","............"]}
+sakura:{map:["................",".....kk..kk.....","....kppkkppk....","....kppppppk....","...kkpkyykpkk...","..kpppyyyykppk..","..kppkyyyykppk..","...kkpkyykpkk...","....kppppppk....","....kpkkkkpk....","...kppk..kppk...","...kpk....kpk...","....k......k....","................","................","................"]},
+randoseru:{map:["................",".....kkkkkk.....","....k......k....","...kkkkkkkkkk...","..krrrrrrrrrrk..","..krRRRRRRRRrk..","..krRrrrrrrRrk..","..krRrrrrrrRrk..","..krRrrYYrrrRk..","..krRrrrrrrRrk..","..krRRRRRRRRrk..","...kkkkkkkkkk...","................","................","................","................"]},
+book:{map:["................","................","...kkkk..kkkk...","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","..kwddwkkwddwk..","..kwwwwkkwwwwk..","...kwwwkkwwwk...","....kBBBBBBk....","................","................","................","................"]},
+ball:{map:["................","....kkkkkkkk....","..kkWWWWWWWWkk..",".kWWkWWWWWWkWWk.",".kWRkWWWWWWkRWk.","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk","kWWRkWWWWWWkRWWk",".kWRkWWWWWWkRWk.",".kWWkWWWWWWkWWk.","..kkWWWWWWWWkk..","....kkkkkkkk....","................","................","................"]},
+cap:{map:["................","................",".....kkkkkk.....","...kkkkkkkkkk...",".kkkkkkkkkkkkkk.","...kkkkkkkkkk.y.","....kkkkkkkk.y..",".....kddddk.y...",".....kddddk.....","...kkkkkkkkkk...","...kwwwwwwwwk...","...kkkkkkkkkk...","................","................","................","................"]},
+brief:{map:["................","................",".....kkkkkk.....","....k......k....","....kk....kk....","..kkkkkkkkkkkk..","..knnnnnnnnnnk..","..knnnnnnnnnnk..","..knnkYYknnnnk..","..knnnnnnnnnnk..","..knnnnnnnnnnk..","..kkkkkkkkkkkk..","................","................","................","................"]},
+heart:{map:["................","................","..kkkk....kkkk..",".krrrrk..krrrrk.",".krwwrrkkrrrrrk.","krwwwwrrrrrrrrrk","krwwwrrrrrrrrrrk",".krrrrrrrrrrrrk.","..krrrrrrrrrrk..","...krrrrrrrrk...","....krrrrrrk....",".....krrrrk.....","......krrk......",".......kk.......","................","................"]},
+ring:{map:["................","......kcck......",".....kcccck.....","....kcKccKck....",".....kcccck.....","......kyyk......","....kyyyyyyk....","...kyykkkyykk...","..kyyk....kyyk..","..kyk......kyk..","..kyyk....kyyk..","...kyykkkyykk...","....kyyyyyyk....","................","................","................"]},
+stroller:{map:["................","....kkkkkk......","..kkppppppkk....",".kppppppppppk...",".kpppppppppppk..","..kkppppppppk...","....kkkkkkkkkk..","......kkkkkk....","....kk......kk..","...kllk....kllk.","...klkk....klkk.","....kk......kk..","................","................","................","................"]},
+house:{map:["................",".......kk.......","......krrk......",".....krrrrk.....","....krrrrrrk....","...krrkrrkrrk...","..krrrrrrrrrrk..","....kkkkkkkk....","....kWWWWWWk....","....kWkkWnnk....","....kWWWWnnk....","....kWWWWnnk....","...kkkkkkkkkk...","..kggggggggggk..","................","................"]},
+hospital:{map:["................","................","..kkkkkkkkkkkk..","..kWWWWWWWWWWk..","..kWWWWrrWWWWk..","..kWWWWrrWWWWk..","..kWWrrrrrrWWk..","..kWWrrrrrrWWk..","..kWWWWrrWWWWk..","..kWWWWrrWWWWk..","..kWWWWWWWWWWk..","..kkkkkkkkkkkk..","................","................","................","................"]},
+coin:{map:["................","....kkkkkkkk....","...kyyyyyyyyk...","..kyyyyyyyyyyk..",".kyyYYyyyyYYyyk.",".kyyyYYyyYYyyyk.",".kyyyyYYYYyyyyk.",".kyyyYYYYYYyyyk.",".kyyyyyYYyyyyyk.",".kyyyYYYYYYyyyk.","..kyyyyyyyyyyk..","...kyyyyyyyyk...","....kkkkkkkk....","................","................","................"]},
+train:{map:["................","................","....kkkkkkkk....","..kkkkkkkkkkkk..","..kWWWWWWWWWWk..","..kcccccccccck..","..kcckcccckcck..","..kcccccccccck..","..kWWWWWWWWWWk..","..kWWWWWWWWWWk..","..kWyWWWWWWyWk..","..kkkkkkkkkkkk..","...kkk....kkk...","................","................","................"]},
+candle:{map:["................",".......oo.......","......oyyo......","......oyyo......",".......kk.......",".....kkkkkk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....",".....kWWWWk.....","....kkkkkkkk....",".kyyyyyyyyyyyyk.","...kkkkkkkkkk..."]},
+gift:{map:["................","....kkk..kkk....","...kyyk..kyyk...","...kyykkkyyk....","....kyyyyyk.....","..kkkkkyykkkkk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","..krrrrkyykrrk..","...kkkkkkkkkk...","................","................","................","................"]},
+dog:{map:["................","................","..kk........kk..",".khhk......khhk.",".khhkkkkkkkkhhk.","..khhhhhhhhhhk..","..khkkhhhhkkhk..","..khhhhhhhhhhk..","...khhkkkkhhk...","...khkwwwwkhk...","....kkhkkhkk....",".....khrrhk.....",".......kk.......","................","................","................"]},
+storm:{map:["................","................",".....kkkk.......","....kllllkkk....","..kkllllllllk...",".klllllllllllk..",".klllllllllllk..",".klllllllllldk..","..kkkkkkkkkkkk..","......kYYk......",".....kYYk.......","....kYYkk.......",".....kYYk.......","....kYYk........","....kkk.........","................"]},
+tea:{map:["....d...d...d...","...d...d...d....","....d...d...d...","................","..kkkkkkkkkkk...","..kWggggggWWkk..","..kWWWWWWWWk.k..","..kWWWWWWWWkkk..","...kWWWWWWk.k...","....kkkkkkk.....","................","..kkkkkkkkkkk...","...kkkkkkkkk....","................","................","................"]},
+broken:{map:["................","................","..kkkk....kkkk..",".krrrrk..krrrrk.",".krwwrrkkrrrrrk.","krwwwwrrwrrrrrrk",".krrrrrwrrrrrrk.","..krrrrwrrrrrk..","...krrrwrrrrk...","....krrwrrrk....",".....krwrrk.....","......kwrk......",".......kk.......","................","................","................"]},
+phone:{map:["................","................","....kkkkkkkk....","....kddddddk....","....dkcccccdk...","....kdcwwccdk...","....kdcwcccdk...","....kdcccccdk...","....kdcccccdk...","....kdcwwccdk...","....kddddddk....","....kkkllkkk....","....kkkkkkkk....","................","................","................"]},
+baby:{map:["................",".....kkkkkk.....","...kkppppppkk...","..kppppppppppk..","..kppkkkkkkppk..",".kppksssssskppk.",".kppksssssskppk.",".kppksksskskppk.",".kppksssssskppk.",".kppkssrrsskppk.","..kkppkkkkppkk..","...kkppppppkk...","....kkkkkkkk....","................","................","................"]}
 };
 const _iconCache={};
-function svgIcon(name){if(_iconCache[name])return _iconCache[name];const ic=ICONS[name]||ICONS.sprout;let r="";ic.map.forEach((row,y)=>{row.padEnd(12,".").split("").forEach((ch,x)=>{const c=ic.pal[ch];if(c)r+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>'})});const svg='<svg viewBox="0 0 12 12" width="19" height="19" aria-hidden="true" shape-rendering="crispEdges">'+r+"</svg>";_iconCache[name]=svg;return svg}
-function iconFor(e){const t=e.txt||"";
-  if(e.kind==="birth"||e.age===0)return "baby";
-  if(/亡くな|死去|葬儀|葬式|墓前|看取/.test(t))return "flame";
-  if(/幼なじみ|秘密基地/.test(t))return "sakura";
-  if(e.kind==="history")return "flag";
-  if(/電車|通学|通勤/.test(t))return "train";
-  if(/結婚|婚約|プロポーズ|告白|初恋/.test(t))return "heart";
-  if(/桜/.test(t))return "sakura";
-  if(/入学|卒業|学校|受験|合格|進学|大学|高校|テスト|試験/.test(t))return "school";
-  if(/読書|図書|勉強/.test(t))return "book";
-  if(/野球|サッカー|部活|大会|試合|運動会|マラソン/.test(t))return "ball";
-  if(/就職|転職|退職|起業|会社|仕事/.test(t))return "briefcase";
-  if(/赤ちゃん|出産|生まれてき/.test(t))return "baby";
-  if(/引っ越|上京|家を建|移住|ふるさとに戻|実家/.test(t))return "house";
-  if(/旅行|海外|飛行機|新幹線/.test(t))return "globe";
-  if(/入院|病院|手術|病気|けが|骨折/.test(t))return "cross";
-  if(/給料|貯金|資産|年金|お金|財布|借金/.test(t))return "coin";
-  if(/音楽|歌|ライブ|バンド|ピアノ/.test(t))return "note";
-  if(e.kind==="decision")return "diamond";
-  if(e.kind==="major")return "star";
-  if(e.kind==="hitoiki")return "cup";
-  if(e.kind==="companion")return "person";
-  return "sprout"}
+function svgIcon(name){
+  if(_iconCache[name])return _iconCache[name];
+  const ic=ICONS[name]||ICONS.sakura;let r="";
+  ic.map.forEach((row,y)=>{let x=0;while(x<16){const c=row[x];if(c==="."){x++;continue}let e=x;while(e<16&&row[e]===c)e++;const col=IPAL[c];if(col)r+='<rect x="'+x+'" y="'+y+'" width="'+(e-x)+'" height="1" fill="'+col+'"/>';x=e}});
+  return _iconCache[name]='<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">'+r+"</svg>";
+}
+const ICON_RULES=[
+["candle",/亡くな|亡き|訃報|永眠|息を引き取|死去/],
+["stroller",/第一子|人目の子|孫が|子どもが生まれ|出産|双子/],
+["ring",/結婚/],
+["broken",/離婚|別れ|破局/],
+["hospital",/病気|入院|がん|手術|治療|介護|健康診断|寝込|薬を|再検査/],
+["storm",/地震|台風|大雨|停電|大雪|猛暑|災害|豪雨|吹雪/],
+["gift",/祭|祝い|七五三|成人式|還暦|喜寿|米寿|白寿|金婚式|銀婚式|誕生日/],
+["train",/電車|通学|バス|旅行|帰省|温泉|出かけ|訪ね|免許|新幹線|島を出/],
+["randoseru",/小学校|ランドセル|小学生/],
+["cap",/大学|卒業|合格|受験|専門学校|浪人|進学/],
+["book",/中学|高校|勉強|テスト|宿題|図書|読書|資格|一夜漬け/],
+["ball",/部活|大会|運動会|サッカー|野球|水泳|体操|ジム|運動|スポーツ|マラソン/],
+["heart",/恋人|好きな人|恋|告白|デート|付き合|交際/],
+["dog",/犬|猫|ペット/],
+["phone",/スマホ|携帯電話|SNS/],
+["coin",/年収|貯金|貯蓄|借金|遺産|年金|ローン|退職金|給料|金欠|投資|ふるさと納税/],
+["house",/家を買|持ち家|引っ越|一人暮らし|実家|地元|Uターン|新居/],
+["brief",/就職|転職|会社|仕事|昇進|退職|職場|アルバイト|転勤|後輩|同期/],
+["baby",/生まれる|夜泣き|歩けるように|つかまり立ち/]];
+function iconFor(e){
+  if(e&&e.kind==="birth")return "baby";
+  const t=(e&&(e.txt||e.text))||(e&&e.parts?e.parts.map(p=>p.t||"").join(""):"");
+  for(const [n,re] of ICON_RULES)if(re.test(t))return n;
+  if(e&&e.kind==="hitoiki")return "tea";
+  if(typeof sim!=="undefined"&&sim&&sim.s&&sim.s.age>=65)return "tea";
+  return "sakura";
+}
 function styledParts(e){
   const wrap=(txt,kind)=>{const cls=kind==="decision"?"p-dec":(kind==="major"||kind==="birth")?"p-major":(kind==="history"||kind==="companion")?"p-dim":"";const seg=(kind==="decision"?"▸ ":"")+esc(txt);return cls?'<span class="'+cls+'">'+seg+"</span>":seg};
   if(e.parts&&e.parts.length){let out="",prevEnd=true;for(const pt of e.parts){out+=(out&&!prevEnd?" ":"")+wrap(pt.txt,pt.kind);prevEnd=/[。！？]$/.test(pt.txt)}return out}
